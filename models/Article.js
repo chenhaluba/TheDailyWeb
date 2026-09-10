@@ -1,39 +1,102 @@
 const mongoose = require('mongoose');
 
-const articleSchema = new mongoose.Schema({
 
-    title: { type: String, required: true },
-  summary: { type: String, required: true },
-  content: { type: String, required: true },
-  category: { type: String, required: true },
-  mainImage: { type: String, required: true }, // a path or url for the image of the article
-
-  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  publishDate: { type: Date },
-
-  status: {
-    type: String,
-    enum: ['draft', 'published', 'waitingApprove', 'requireFix'],
-    default: 'Draft'
+const articleVersionSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      trim: true,
+      maxlength: 200,
+      default: "title"
+    },
+    summary: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+      default: "article summary"
+    },
+    content: {
+      type: String,
+      default: ""
+    },
+    category: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+      default: "article category"
+    },
+    mainImage: {
+      type: String,
+      trim: true,
+      default: ""
+    },
+    savedAt: {
+      type: Date,
+      default: Date.now
+    }
   },
-  editorNote: { type: String, default: '' },
+  { _id: false }
+);
 
-  draft: { // duplicate stat that save the edited page
-    title: String,
-    summary: String,
-    content: String,
-    category: String,
-    mainImage: String, // a path or url for the image of the article
-    isDirty: { type: Boolean, default: false } // marks if there is a draft open waiting for approval
+const publicationHistorySchema = new mongoose.Schema(
+  {
+    publishedAt: {
+      type: Date,
+      required: true
+    },
+    approvedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    versionNumber: {
+      type: Number,
+      required: true,
+      min: 1
+    }
   },
+  { _id: false }
+);
 
-  updateHistory: [{
-    updatedAt: { type: Date, default: Date.now } // array of objects, each one holds the time of the update of the article
-  }]
-}, {
-  timestamps: true // adds automaticly a createa and udpate fields to the article itself
-});
+const articleSchema = new mongoose.Schema(
+  {
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    status: {
+      type: String,
+      enum: ["draft", "pending", "published", "returned"],
+      default: "draft"
+    },
+    publishedVersion: {
+      type: articleVersionSchema,
+      default: null
+    },
+    workingVersion: {
+      type: articleVersionSchema,
+      default: () => ({})
+    },
+    editorNote: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+      default: ""
+    },
+    publicationHistory: [publicationHistorySchema],
+    totalViews: {
+      type: Number,
+      default: 0,
+      min: 0
+    }
+  },
+  { timestamps: true }
+);
 
-const Article = mongoose.model('Article', articleSchema); // Article is the name of the collection in the database
+articleSchema.index({ author: 1, status: 1 });
+articleSchema.index({ "publishedVersion.category": 1, status: 1 });
+articleSchema.index({ totalViews: -1 });
+articleSchema.index({ "publishedVersion.title": "text" });
 
-module.exports = Article; // share article.js file to other files in project
+module.exports = mongoose.model("Article", articleSchema);

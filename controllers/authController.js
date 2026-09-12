@@ -11,7 +11,7 @@ async function login(req, res) {
 
     const { username, password } = req.body;
 
-    const user = await User.findOne({ username: username });
+    const user = await User.findOne({ username: username }).select('+passwordHash');
     if (!user){
       return res.status(401).json({ message: 'No user found with that username.' });
     }
@@ -50,4 +50,9 @@ async function login(req, res) {
   }
 }
 
-module.exports = { login };
+const logout = (req, res) => {
+    res.clearCookie('token');
+    return res.redirect('/login');
+};
+
+module.exports = { login, logout };

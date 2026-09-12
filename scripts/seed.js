@@ -4,8 +4,7 @@ const Article = require("../models/Article");
 const User = require("../models/User");
 const mongoose = require("mongoose");
 const connectDatabase = require("../config/database");
-
-
+const bcrypt = require("bcrypt");
 
 const seedDatabase = async () =>{
     try{
@@ -16,10 +15,12 @@ const seedDatabase = async () =>{
         await User.deleteMany({});
         console.log("Cleared old data...");
 
+        const hashedEditorPass = await bcrypt.hash("main_editor", 10);
+        const hashedReporterPass = await bcrypt.hash("star_reporter", 10);
 
         const editor = await User.create({
             username: "main_editor",
-            passwordHash: "dummy_hashed_password_123",
+            passwordHash: hashedEditorPass,
             displayName: "Alice The Editor",
             role: "editor",
             isActive: true
@@ -27,13 +28,13 @@ const seedDatabase = async () =>{
 
         const reporter = await User.create({
             username: "star_reporter",
-            passwordHash: "dummy_hashed_password_456",
+            passwordHash: hashedReporterPass,
             displayName: "Bob The Reporter",
             role: "reporter",
             isActive: true
         });
 
-
+        console.log("Created dummy users with hashed passwords...");
 
         const articles = [
             // 1. Published Article

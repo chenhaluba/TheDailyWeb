@@ -3,13 +3,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!form) return;
 
     const saveButton = document.getElementById("save-button");
+    const submitButton = document.getElementById("submit-button");
     const saveStatus = document.getElementById("save-status");
 
     let articleId = form.dataset.articleId;
     let isNew = form.dataset.isNew === "true";
     let isDirty = false;
-    let isSaving = false;
     let saveTimer = null;
+    let activeSavePromise = null;
     let lastSavedSnapshot = JSON.stringify(getFormData());
 
     function getFormData() {
@@ -31,6 +32,11 @@ document.addEventListener("DOMContentLoaded", () => {
         saveStatus.className = "save-status";
 
         if (type) saveStatus.classList.add(`save-status-${type}`);
+    }
+
+    function setButtonsDisabled(disabled) {
+        if (saveButton) saveButton.disabled = disabled;
+        if (submitButton) submitButton.disabled = disabled;
     }
 
     function formatSavedTime() {
@@ -62,38 +68,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function saveArticle(force = false) {
+        if (activeSavePromise) await activeSavePromise;
+
         const currentData = getFormData();
         const currentSnapshot = JSON.stringify(currentData);
 
-        if (!force && (!isDirty || currentSnapshot === lastSavedSnapshot)) return;
+        if (!force && (!isDirty || currentSnapshot === lastSavedSnapshot)) return true;
 
-        if (isSaving) {
-            scheduleSave();
-            return;
-        }
-
-        isSaving = true;
         clearTimeout(saveTimer);
         showStatus(isNew ? "יוצר טיוטה..." : "שומר...");
-
-        if (saveButton) saveButton.disabled = true;
+        setButtonsDisabled(true);
 
         const requestUrl = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
         const requestMethod = isNew ? "POST" : "PATCH";
 
-        try {
-            const response = await fetch(requestUrl, {
-                method: requestMethod,
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify(currentData),
-                keepalive: true
-            });
+        activeSavePromise = fetch(requestUrl, {
+            method: requestMethod,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(currentData),
+            keepalive: true
+        });
 
+        try {
+            const response = await activeSavePromise;
             const result = await readResponse(response);
-            if (!result) return;
+
+            if (!result) return false;
 
             if (!response.ok || !result.success) {
                 throw new Error(result.message || "שמירת הכתבה נכשלה");
@@ -107,6 +110,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.history.replaceState({}, "", `/reporter/articles/${articleId}/edit`);
 
                 if (saveButton) saveButton.textContent = "שמירה עכשיו";
+                if (submitButton) submitButton.hidden = false;
             }
 
             lastSavedSnapshot = currentSnapshot;
@@ -114,18 +118,55 @@ document.addEventListener("DOMContentLoaded", () => {
             showStatus(`נשמר בשעה ${formatSavedTime()}`, "success");
 
             if (isDirty) scheduleSave();
+            return true;
         } catch (error) {
             console.error("Failed to save article:", error);
             isDirty = true;
             showStatus(error.message || "השמירה נכשלה", "error");
+            return false;
         } finally {
-            isSaving = false;
-            if (saveButton) saveButton.disabled = false;
+            activeSavePromise = null;
+            setButtonsDisabled(false);
+        }
+    }
+
+    async function submitArticle() {
+        clearTimeout(saveTimer);
+
+        const savedSuccessfully = await saveArticle(true);
+        if (!savedSuccessfully || !articleId) return;
+
+        const shouldSubmit = window.confirm("לשלוח את הכתבה לאישור העורך?");
+        if (!shouldSubmit) return;
+
+        setButtonsDisabled(true);
+        showStatus("שולח לאישור...");
+
+        try {
+            const response = await fetch(`/api/reporter/articles/${articleId}/submit`, {
+                method: "POST",
+                headers: { "Accept": "application/json" }
+            });
+
+            const result = await readResponse(response);
+            if (!result) return;
+
+            if (!response.ok || !result.success) {
+                const errorMessages = result.errors && result.errors.length > 0 ? result.errors.join(", ") : result.message;
+                throw new Error(errorMessages || "שליחת הכתבה נכשלה");
+            }
+
+            showStatus("הכתבה נשלחה לאישור", "success");
+            window.location.href = "/reporter/dashboard";
+        } catch (error) {
+            console.error("Failed to submit article:", error);
+            showStatus(error.message || "שליחת הכתבה נכשלה", "error");
+            setButtonsDisabled(false);
         }
     }
 
     function saveBeforeLeaving() {
-        if (!isDirty || isSaving) return;
+        if (!isDirty || activeSavePromise) return;
 
         const requestUrl = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
         const requestMethod = isNew ? "POST" : "PATCH";
@@ -138,14 +179,11 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify(getFormData()),
             keepalive: true
-        }).catch((error) => {
-            console.error("Failed to save article before leaving:", error);
-        });
+        }).catch((error) => console.error("Failed to save article before leaving:", error));
     }
 
     form.addEventListener("input", () => {
-        const currentSnapshot = JSON.stringify(getFormData());
-        isDirty = currentSnapshot !== lastSavedSnapshot;
+        isDirty = JSON.stringify(getFormData()) !== lastSavedSnapshot;
 
         if (!isDirty) {
             clearTimeout(saveTimer);
@@ -163,11 +201,11 @@ document.addEventListener("DOMContentLoaded", () => {
         await saveArticle(true);
     });
 
+    if (submitButton) submitButton.addEventListener("click", submitArticle);
+
     window.addEventListener("pagehide", saveBeforeLeaving);
 
     document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "hidden" && isDirty && !isSaving) {
-            saveArticle();
-        }
+        if (document.visibilityState === "hidden" && isDirty && !activeSavePromise) saveArticle();
     });
 });

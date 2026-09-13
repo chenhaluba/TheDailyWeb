@@ -261,6 +261,59 @@ async function saveReporterDraft(req, res) {
     }
 }
 
+function validateArticleForSubmission(workingVersion) {
+    const requiredFields = [
+        { name: "title", label: "כותרת" },
+        { name: "summary", label: "תקציר" },
+        { name: "content", label: "תוכן" },
+        { name: "category", label: "קטגוריה" },
+        { name: "mainImage", label: "תמונה ראשית" }
+    ];
+
+    return requiredFields
+        .filter((field) => !workingVersion[field.name] || !workingVersion[field.name].trim())
+        .map((field) => `השדה ${field.label} הוא שדה חובה`);
+}
+
+async function submitReporterArticle(req, res) {
+    const articleId = req.params.id;
+
+    if (!mongoose.isValidObjectId(articleId)) {
+        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+    }
+
+    try {
+        const article = await Article.findOne({ _id: articleId, author: req.user.userID });
+
+        if (!article) {
+            return sendApiError(res, 404, "הכתבה לא נמצאה");
+        }
+
+        if (!["draft", "returned"].includes(article.status)) {
+            return sendApiError(res, 400, "לא ניתן לשלוח את הכתבה לאישור במצב הנוכחי");
+        }
+
+        const validationErrors = validateArticleForSubmission(article.workingVersion);
+
+        if (validationErrors.length > 0) {
+            return sendApiError(res, 400, "יש להשלים את כל שדות הכתבה לפני השליחה", validationErrors);
+        }
+
+        article.status = "pending";
+        article.editorNote = "";
+        await article.save();
+
+        return res.status(200).json({
+            success: true,
+            data: { article: { id: article._id.toString(), status: article.status } },
+            message: "הכתבה נשלחה לאישור העורך"
+        });
+    } catch (error) {
+        console.error("Failed to submit reporter article:", error.message);
+        return sendApiError(res, 500, "לא ניתן היה לשלוח את הכתבה לאישור");
+    }
+}
+
 module.exports = {
     renderDashboard,
     renderNewArticle,
@@ -268,5 +321,6 @@ module.exports = {
     getReporterArticles,
     getReporterArticleById,
     createReporterArticle,
-    saveReporterDraft
+    saveReporterDraft,
+    submitReporterArticle
 };

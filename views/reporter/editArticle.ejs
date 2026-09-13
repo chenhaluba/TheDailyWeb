@@ -82,6 +82,7 @@
                 <% if (isEditable) { %>
                     <div class="form-actions">
                         <button type="submit" id="save-button" class="primary-button"><%= isNew ? "יצירת טיוטה" : "שמירה עכשיו" %></button>
+                        <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>שליחה לאישור</button>
                         <span id="save-status" class="save-status" aria-live="polite"><%= isNew ? "הטיוטה תיווצר אוטומטית בתחילת הכתיבה" : "כל השינויים נשמרו" %></span>
                     </div>
                 <% } %>

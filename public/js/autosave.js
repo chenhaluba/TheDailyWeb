@@ -25,6 +25,22 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
+    function validateFormForSubmission() {
+        const articleData = getFormData();
+        const requiredFields = [
+            { name: "title", label: "כותרת" },
+            { name: "summary", label: "תקציר" },
+            { name: "content", label: "תוכן" },
+            { name: "category", label: "קטגוריה" },
+            { name: "mainImage", label: "תמונה ראשית" }
+        ];
+
+        return requiredFields
+            .filter((field) => !articleData[field.name].trim())
+            .map((field) => field.label);
+    }
+
+
     function showStatus(message, type = "") {
         if (!saveStatus) return;
 
@@ -82,62 +98,73 @@ document.addEventListener("DOMContentLoaded", () => {
         const requestUrl = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
         const requestMethod = isNew ? "POST" : "PATCH";
 
-        activeSavePromise = fetch(requestUrl, {
-            method: requestMethod,
-            headers: {
-                "Content-Type": "application/json",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify(currentData),
-            keepalive: true
-        });
+        const saveOperation = (async () => {
+            try {
+                const response = await fetch(requestUrl, {
+                    method: requestMethod,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(currentData),
+                    keepalive: true
+                });
 
-        try {
-            const response = await activeSavePromise;
-            const result = await readResponse(response);
+                const result = await readResponse(response);
+                if (!result) return false;
 
-            if (!result) return false;
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || "שמירת הכתבה נכשלה");
+                }
 
-            if (!response.ok || !result.success) {
-                throw new Error(result.message || "שמירת הכתבה נכשלה");
+                if (isNew) {
+                    articleId = result.data.article.id;
+                    isNew = false;
+                    form.dataset.articleId = articleId;
+                    form.dataset.isNew = "false";
+                    window.history.replaceState({}, "", `/reporter/articles/${articleId}/edit`);
+
+                    if (saveButton) saveButton.textContent = "שמירה עכשיו";
+                    if (submitButton) submitButton.hidden = false;
+                }
+
+                lastSavedSnapshot = currentSnapshot;
+                isDirty = JSON.stringify(getFormData()) !== lastSavedSnapshot;
+                showStatus(`נשמר בשעה ${formatSavedTime()}`, "success");
+
+                if (isDirty) scheduleSave();
+                return true;
+            } catch (error) {
+                console.error("Failed to save article:", error);
+                isDirty = true;
+                showStatus(error.message || "השמירה נכשלה", "error");
+                return false;
+            } finally {
+                setButtonsDisabled(false);
             }
+        })();
 
-            if (isNew) {
-                articleId = result.data.article.id;
-                isNew = false;
-                form.dataset.articleId = articleId;
-                form.dataset.isNew = "false";
-                window.history.replaceState({}, "", `/reporter/articles/${articleId}/edit`);
+        activeSavePromise = saveOperation;
+        const savedSuccessfully = await saveOperation;
 
-                if (saveButton) saveButton.textContent = "שמירה עכשיו";
-                if (submitButton) submitButton.hidden = false;
-            }
-
-            lastSavedSnapshot = currentSnapshot;
-            isDirty = JSON.stringify(getFormData()) !== lastSavedSnapshot;
-            showStatus(`נשמר בשעה ${formatSavedTime()}`, "success");
-
-            if (isDirty) scheduleSave();
-            return true;
-        } catch (error) {
-            console.error("Failed to save article:", error);
-            isDirty = true;
-            showStatus(error.message || "השמירה נכשלה", "error");
-            return false;
-        } finally {
-            activeSavePromise = null;
-            setButtonsDisabled(false);
-        }
+        if (activeSavePromise === saveOperation) activeSavePromise = null;
+        return savedSuccessfully;
     }
-
     async function submitArticle() {
         clearTimeout(saveTimer);
 
-        const savedSuccessfully = await saveArticle(true);
-        if (!savedSuccessfully || !articleId) return;
+        const missingFields = validateFormForSubmission();
+
+        if (missingFields.length > 0) {
+            showStatus(`יש להשלים את השדות: ${missingFields.join(", ")}`, "error");
+            return;
+        }
 
         const shouldSubmit = window.confirm("לשלוח את הכתבה לאישור העורך?");
         if (!shouldSubmit) return;
+
+        const savedSuccessfully = await saveArticle(true);
+        if (!savedSuccessfully || !articleId) return;
 
         setButtonsDisabled(true);
         showStatus("שולח לאישור...");
@@ -152,8 +179,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!result) return;
 
             if (!response.ok || !result.success) {
-                const errorMessages = result.errors && result.errors.length > 0 ? result.errors.join(", ") : result.message;
-                throw new Error(errorMessages || "שליחת הכתבה נכשלה");
+                const message = result.errors && result.errors.length > 0 ? result.errors.join(", ") : result.message;
+                throw new Error(message || "שליחת הכתבה נכשלה");
             }
 
             showStatus("הכתבה נשלחה לאישור", "success");

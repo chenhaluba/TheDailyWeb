@@ -8,6 +8,8 @@ const statusDetails = {
     returned: { label: "הוחזרה לתיקונים", cssClass: "returned" }
 };
 
+const allowedStatuses = Object.keys(statusDetails);
+
 function formatDate(date) {
     if (!date) return "טרם נשמרה";
 
@@ -146,8 +148,17 @@ async function renderEditArticle(req, res) {
 }
 
 async function getReporterArticles(req, res) {
+    const requestedStatus = req.query.status;
+
+    if (requestedStatus && (typeof requestedStatus !== "string" || !allowedStatuses.includes(requestedStatus))) {
+        return sendApiError(res, 400, "סטטוס הכתבה אינו תקין");
+    }
+
     try {
-        const articles = await Article.find({ author: req.user.userID }).sort({ updatedAt: -1 }).lean();
+        const filter = { author: req.user.userID };
+        if (requestedStatus) filter.status = requestedStatus;
+
+        const articles = await Article.find(filter).sort({ updatedAt: -1 }).lean();
 
         return res.status(200).json({
             success: true,
@@ -271,7 +282,10 @@ function validateArticleForSubmission(workingVersion) {
     ];
 
     return requiredFields
-        .filter((field) => !workingVersion[field.name] || !workingVersion[field.name].trim())
+        .filter((field) => {
+            const value = workingVersion ? workingVersion[field.name] : null;
+            return typeof value !== "string" || !value.trim();
+        })
         .map((field) => `השדה ${field.label} הוא שדה חובה`);
 }
 
@@ -290,7 +304,7 @@ async function submitReporterArticle(req, res) {
         }
 
         if (!["draft", "returned"].includes(article.status)) {
-            return sendApiError(res, 400, "לא ניתן לשלוח את הכתבה לאישור במצב הנוכחי");
+            return sendApiError(res, 400, "ניתן לשלוח לאישור רק כתבה שבהכנה או כתבה שהוחזרה לתיקונים");
         }
 
         const validationErrors = validateArticleForSubmission(article.workingVersion);
@@ -310,6 +324,11 @@ async function submitReporterArticle(req, res) {
         });
     } catch (error) {
         console.error("Failed to submit reporter article:", error.message);
+
+        if (error.name === "ValidationError") {
+            return sendApiError(res, 400, "הנתונים שהוזנו אינם תקינים", getValidationErrors(error));
+        }
+
         return sendApiError(res, 500, "לא ניתן היה לשלוח את הכתבה לאישור");
     }
 }

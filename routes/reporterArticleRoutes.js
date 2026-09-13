@@ -6,7 +6,8 @@ const {
     getReporterArticleById,
     createReporterArticle,
     saveReporterDraft,
-    submitReporterArticle
+    submitReporterArticle,
+    startPublishedArticleUpdate
 } = require("../controllers/reporterArticleController");
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get("/:id", getReporterArticleById);
 router.post("/", createReporterArticle);
 router.patch("/:id/draft", saveReporterDraft);
 router.post("/:id/submit", submitReporterArticle);
+router.post("/:id/start-update", startPublishedArticleUpdate);
 
 module.exports = router;

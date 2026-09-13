@@ -314,6 +314,58 @@ async function submitReporterArticle(req, res) {
     }
 }
 
+async function startPublishedArticleUpdate(req, res) {
+    const articleId = req.params.id;
+
+    if (!mongoose.isValidObjectId(articleId)) {
+        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+    }
+
+    try {
+        const article = await Article.findOne({ _id: articleId, author: req.user.userID });
+
+        if (!article) {
+            return sendApiError(res, 404, "הכתבה לא נמצאה");
+        }
+
+        if (article.status !== "published") {
+            return sendApiError(res, 400, "לא ניתן להתחיל עדכון לכתבה במצב הנוכחי");
+        }
+
+        if (!article.publishedVersion) {
+            return sendApiError(res, 400, "לכתבה אין גרסה שפורסמה");
+        }
+
+        article.workingVersion = {
+            title: article.publishedVersion.title,
+            summary: article.publishedVersion.summary,
+            content: article.publishedVersion.content,
+            category: article.publishedVersion.category,
+            mainImage: article.publishedVersion.mainImage,
+            savedAt: new Date()
+        };
+
+        article.status = "draft";
+        article.editorNote = "";
+
+        await article.save();
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                article: {
+                    id: article._id.toString(),
+                    status: article.status
+                }
+            },
+            message: "נוצרה גרסת עבודה חדשה לכתבה"
+        });
+    } catch (error) {
+        console.error("Failed to start published article update:", error.message);
+        return sendApiError(res, 500, "לא ניתן היה להתחיל את עדכון הכתבה");
+    }
+}
+
 module.exports = {
     renderDashboard,
     renderNewArticle,
@@ -322,5 +374,6 @@ module.exports = {
     getReporterArticleById,
     createReporterArticle,
     saveReporterDraft,
-    submitReporterArticle
+    submitReporterArticle,
+    startPublishedArticleUpdate
 };

@@ -381,3 +381,13 @@ a { color: inherit; text-decoration: none; }
 @media (max-width: 760px) {
     .submit-button { width: 100%; }
 }
+
+.start-update-button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.start-update-button:disabled {
+    opacity: 0.65;
+    cursor: wait;
+}

@@ -130,12 +130,7 @@
                                         עריכת הכתבה
                                     </a>
                                 <% } else if (article.canStartUpdate) { %>
-                                    <a
-                                        href="/reporter/articles/<%= article.id %>/edit"
-                                        class="secondary-button"
-                                    >
-                                        התחלת עדכון
-                                    </a>
+                                    <button type="button" class="secondary-button start-update-button" data-article-id="<%= article.id %>">התחלת עדכון</button>
                                 <% } else { %>
                                     <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">צפייה בכתבה</a>
                                 <% } %>
@@ -146,5 +141,6 @@
             <% } %>
         </section>
     </main>
+    <script src="/js/reporterDashboard.js"></script>
 </body>
 </html>

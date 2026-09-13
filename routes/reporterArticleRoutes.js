@@ -2,9 +2,10 @@ const express = require("express");
 const { validateSession } = require("../middleware/authMiddleware");
 const { validateRole } = require("../middleware/roleMiddleware");
 const {
-    renderDashboard,
-    renderNewArticle,
-    renderEditArticle
+    getReporterArticles,
+    getReporterArticleById,
+    createReporterArticle,
+    saveReporterDraft
 } = require("../controllers/reporterArticleController");
 
 const router = express.Router();
@@ -12,8 +13,9 @@ const router = express.Router();
 router.use(validateSession);
 router.use(validateRole("reporter"));
 
-router.get("/dashboard", renderDashboard);
-router.get("/articles/new", renderNewArticle);
-router.get("/articles/:id/edit", renderEditArticle);
+router.get("/", getReporterArticles);
+router.get("/:id", getReporterArticleById);
+router.post("/", createReporterArticle);
+router.patch("/:id/draft", saveReporterDraft);
 
 module.exports = router;

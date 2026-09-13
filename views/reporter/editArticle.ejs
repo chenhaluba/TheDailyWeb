@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> | The Daily Web</title>
+    <link rel="stylesheet" href="/css/reporter.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <a href="/" class="site-logo">The Daily Web</a>
+
+            <nav class="header-navigation">
+                <a href="/reporter/dashboard">הכתבות שלי</a>
+                <a href="/logout" class="logout-link">התנתקות</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="editor-container">
+        <div class="editor-navigation">
+            <a href="/reporter/dashboard" class="back-link">חזרה לכתבות שלי</a>
+        </div>
+
+        <section class="editor-heading">
+            <div>
+                <p class="dashboard-label"><%= isNew ? "יצירת כתבה" : "ניהול כתבה" %></p>
+                <h1><%= isNew ? "כתבה חדשה" : (isEditable ? "עריכת כתבה" : "פרטי הכתבה") %></h1>
+            </div>
+
+            <% if (!isNew) { %>
+                <span class="status-badge status-<%= article.statusClass %>"><%= article.statusLabel %></span>
+            <% } %>
+        </section>
+
+        <% if (article.editorNote) { %>
+            <div class="editor-note editor-page-note">
+                <strong>הערת העורך</strong>
+                <p><%= article.editorNote %></p>
+            </div>
+        <% } %>
+
+        <% if (article.status === "pending") { %>
+            <div class="message message-information">הכתבה ממתינה לבדיקת העורך ולכן לא ניתן לערוך אותה כרגע.</div>
+        <% } %>
+
+        <% if (article.status === "published") { %>
+            <div class="message message-information">זוהי כתבה שפורסמה. האפשרות להתחיל עבורה עדכון חדש תתווסף בשלב הבא.</div>
+        <% } %>
+
+        <section class="article-editor">
+            <form id="article-form" data-article-id="<%= article.id %>" data-is-new="<%= isNew %>">
+                <div class="form-group">
+                    <label for="title">כותרת</label>
+                    <input type="text" id="title" name="title" maxlength="200" value="<%= article.workingVersion.title || "" %>" placeholder="הקלידו את כותרת הכתבה" <% if (!isEditable) { %>disabled<% } %>>
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">תקציר</label>
+                    <textarea id="summary" name="summary" rows="4" maxlength="500" placeholder="כתבו תקציר קצר של הכתבה" <% if (!isEditable) { %>disabled<% } %>><%= article.workingVersion.summary || "" %></textarea>
+                    <span class="field-help">עד 500 תווים</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="category">קטגוריה</label>
+                        <input type="text" id="category" name="category" maxlength="100" value="<%= article.workingVersion.category || "" %>" placeholder="לדוגמה: טכנולוגיה" <% if (!isEditable) { %>disabled<% } %>>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="mainImage">תמונה ראשית</label>
+                        <input type="text" id="mainImage" name="mainImage" value="<%= article.workingVersion.mainImage || "" %>" placeholder="כתובת התמונה או שם הקובץ" <% if (!isEditable) { %>disabled<% } %>>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="content">תוכן הכתבה</label>
+                    <textarea id="content" name="content" rows="16" placeholder="כתבו כאן את תוכן הכתבה" <% if (!isEditable) { %>disabled<% } %>><%= article.workingVersion.content || "" %></textarea>
+                </div>
+
+                <% if (isEditable) { %>
+                    <div class="form-actions">
+                        <button type="submit" id="save-button" class="primary-button"><%= isNew ? "יצירת טיוטה" : "שמירת שינויים" %></button>
+                        <span id="save-status" class="save-status" aria-live="polite"></span>
+                    </div>
+                <% } %>
+            </form>
+        </section>
+    </main>
+
+    <script src="/js/autosave.js"></script>
+</body>
+</html>

@@ -3,20 +3,18 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-
 const connectDatabase = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const reporterPageRoutes = require("./routes/reporterPageRoutes");
+const reporterArticleRoutes = require("./routes/reporterArticleRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 
 connectDatabase();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,22 +23,16 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRoutes);
 app.use("/reporter", reporterPageRoutes);
+app.use("/api/reporter/articles", reporterArticleRoutes);
 
 app.get("/", (req, res) => {
-    res.render("public/home", {
-        pageTitle: "The Daily Web"
-    });
+    res.render("public/home", { pageTitle: "The Daily Web" });
 });
 
-
 app.use((req, res) => {
-    res.status(404).render("notFound", {
-        pageTitle: "Page Not Found"
-    });
+    res.status(404).render("notFound", { pageTitle: "Page Not Found" });
 });
 
 app.listen(PORT, () => {
-    console.log(
-        `Server is running on http://localhost:${PORT}`
-    );
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

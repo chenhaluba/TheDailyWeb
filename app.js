@@ -5,6 +5,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const connectDatabase = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
+const pageRoutes = require("./routes/pageRoutes");
 const reporterPageRoutes = require("./routes/reporterPageRoutes");
 const reporterArticleRoutes = require("./routes/reporterArticleRoutes");
 
@@ -24,10 +25,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", authRoutes);
 app.use("/reporter", reporterPageRoutes);
 app.use("/api/reporter/articles", reporterArticleRoutes);
-
-app.get("/", (req, res) => {
-    res.render("public/home", { pageTitle: "The Daily Web" });
-});
+app.use("/", pageRoutes);
 
 app.use((req, res) => {
     res.status(404).render("notFound", { pageTitle: "Page Not Found" });

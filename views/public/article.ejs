@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><%= pageTitle %></title>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/article.css">
+</head>
+
+<body>
+
+    <%- include("../partials/header") %>
+
+    <main class="article-container">
+
+        <article class="article-page">
+
+            <span class="article-category">
+                <%= article.publishedVersion.category %>
+            </span>
+
+            <h1 class="article-title">
+                <%= article.publishedVersion.title %>
+            </h1>
+
+            <div class="article-meta">
+
+                <span>
+                    By <strong><%= article.author.displayName %></strong>
+                </span>
+
+                <span>
+                    •
+                </span>
+
+                <span>
+                    <%= new Date(article.publishedVersion.savedAt).toLocaleDateString() %>
+                </span>
+
+            </div>
+
+            <div class="article-image">
+
+                <img
+                    src="/images/<%= article.publishedVersion.mainImage %>"
+                    alt="<%= article.publishedVersion.title %>">
+
+            </div>
+
+            <div class="article-content">
+
+                <p>
+                    <%= article.publishedVersion.content %>
+                </p>
+
+            </div>
+
+            <a href="/" class="back-btn">
+
+                ← Back to Home
+
+            </a>
+
+        </article>
+
+    </main>
+
+    <%- include("../partials/footer") %>
+
+</body>
+
+</html>

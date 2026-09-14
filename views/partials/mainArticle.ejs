@@ -1,0 +1,45 @@
+<% if (mainArticle) { %>
+
+    <article class="main-article">
+    
+        <div class="main-article-image">
+    
+            <img
+            src="/images/<%= mainArticle.publishedVersion.mainImage %>"
+            alt="<%= mainArticle.publishedVersion.title %>">
+    
+        </div>
+    
+        <div class="main-article-content">
+    
+            <span class="main-article-category">
+                <%= mainArticle.publishedVersion.category %>
+            </span>
+    
+            <h1>
+                <%= mainArticle.publishedVersion.title %>
+            </h1>
+    
+            <p>
+                <%= mainArticle.publishedVersion.summary %>
+            </p>
+    
+            <a
+                href="/articles/<%= mainArticle._id %>"
+                class="read-more-btn">
+    
+                Read More →
+    
+            </a>
+    
+        </div>
+    
+    </article>
+    
+    <% } else { %>
+    
+    <p class="empty-state">
+        No featured article available.
+    </p>
+    
+    <% } %>

@@ -1,19 +1,95 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>The Daily Web</h1>
-    </header>
 
-    <main>
-        <h2>חדשות היום</h2>
-        <p>המערכת פועלת בהצלחה.</p>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+
+    <%- include("../partials/header") %>
+
+    <main class="container">
+
+        <!-- Weather Widget -->
+        <section id="weather-section">
+            <%- include("../partials/weatherWidget") %>
+        </section>
+
+        <!-- Main Article -->
+        <section id="main-article-section">
+
+            <h2 class="section-title">
+                Top Story
+            </h2>
+        
+            <%- include("../partials/mainArticle") %>
+        
+        </section>
+
+        <!-- Search & Filters -->
+        <section id="filters-section">
+
+            <input
+                type="text"
+                id="search-input"
+                placeholder="Search articles...">
+
+            <select id="category-filter">
+                <option value="">All Categories</option>
+                <option value="News">News</option>
+                <option value="Economy">Economy</option>
+                <option value="Politics">Politics</option>
+                <option value="Sports">Sports</option>
+                <option value="Culture">Culture</option>
+                <option value="Technology">Technology</option>
+            </select>
+
+            <select id="sort-filter">
+                <option value="newest">Newest</option>
+                <option value="popular">Most Viewed</option>
+            </select>
+
+        </section>
+
+        <!-- Latest News -->
+        <section id="articles-section">
+
+            <h2 class="section-title">
+                Latest News
+            </h2>
+
+            <div class="articles-grid">
+
+                <% if (articles && articles.length > 0) { %>
+
+                    <% articles.forEach(article => { %>
+
+                        <%- include("../partials/articleCard", { article }) %>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <p class="empty-state">
+                        No additional articles available.
+                    </p>
+
+                <% } %>
+
+            </div>
+
+        </section>
+
     </main>
+
+    <%- include("../partials/footer") %>
+
 </body>
+
 </html>

@@ -17,6 +17,11 @@ const CONSTANTS = {
         "Science"
     ],
 
+    ARTICLE_SORT_OPTIONS: {
+        NEWEST: "newest",
+        POPULAR: "popular"
+    },
+
     DEFAULT_CATEGORY: "News"
 
 };

@@ -97,10 +97,18 @@ img {
     padding: 35px 0;
 }
 
+.main-nav a.active {
+    color: #0a66c2;
+    font-weight: 600;
+}
+
+.main-nav a.active::after {
+    width: 100%;
+}
+
 
 
 @media (max-width:768px) {
-
     .site-header .container {
         flex-direction: column;
         gap: 20px;

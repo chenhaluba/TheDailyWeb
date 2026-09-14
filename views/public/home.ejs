@@ -16,53 +16,152 @@
 
     <main class="container">
 
-        <!-- Weather Widget -->
-        <section id="weather-section">
-            <%- include("../partials/weatherWidget") %>
-        </section>
+        <% if (mainArticle) { %>
 
-        <!-- Main Article -->
-        <section id="main-article-section">
+            <!-- Weather Widget -->
+            <section id="weather-section">
+                <%- include("../partials/weatherWidget") %>
+            </section>
 
-            <h2 class="section-title">
-                Top Story
-            </h2>
-        
-            <%- include("../partials/mainArticle") %>
-        
-        </section>
+            <!-- Main Article -->
+            <section id="main-article-section">
 
-        <!-- Search & Filters -->
+                <h2 class="section-title">
+                    Top Story
+                </h2>
+
+                <%- include("../partials/mainArticle") %>
+
+            </section>
+
+        <% } %>
+
+        <!-- Search -->
         <section id="filters-section">
 
-            <input
-                type="text"
-                id="search-input"
-                placeholder="Search articles...">
+            <form id="search-form" method="GET" action="/">
 
-            <select id="category-filter">
-                <option value="">All Categories</option>
-                <option value="News">News</option>
-                <option value="Economy">Economy</option>
-                <option value="Politics">Politics</option>
-                <option value="Sports">Sports</option>
-                <option value="Culture">Culture</option>
-                <option value="Technology">Technology</option>
-            </select>
+                <input
+                    type="text"
+                    id="search-input"
+                    name="search"
+                    value="<%= search || '' %>"
+                    placeholder="Search by title...">
 
-            <select id="sort-filter">
-                <option value="newest">Newest</option>
-                <option value="popular">Most Viewed</option>
-            </select>
+                <% if (sort) { %>
+                    <input
+                        type="hidden"
+                        name="sort"
+                        value="<%= sort %>">
+                <% } %>
+
+                <% if (category) { %>
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="<%= category %>">
+                <% } %>
+
+                <button
+                    id="search-button"
+                    type="submit">
+                    🔍 Search
+                </button>
+
+            </form>
 
         </section>
 
-        <!-- Latest News -->
+        <!-- Articles -->
         <section id="articles-section">
 
-            <h2 class="section-title">
-                Latest News
-            </h2>
+            <div class="articles-toolbar">
+
+                <div>
+
+                    <% if (search) { %>
+
+                        <h2 class="section-title">
+                            Search Results
+                        </h2>
+                    
+                        <p class="results-count">
+                            Found
+                            <strong><%= resultsCount %></strong>
+                            article(s) matching
+                            "<strong><%= search %></strong>"
+                        </p>
+                    
+                    <% } else if (category) { %>
+                    
+                        <h2 class="section-title">
+                            <%= category %> News
+                        </h2>
+                    
+                        <p class="results-count">
+                            Showing
+                            <strong><%= resultsCount %></strong>
+                            article(s)
+                        </p>
+                    
+                    <% } else { %>
+                    
+                        <h2 class="section-title">
+                            Latest News
+                        </h2>
+                    
+                    <% } %>
+                </div>
+
+                <form
+                    id="sort-form"
+                    method="GET"
+                    action="/">
+
+                    <% if (search) { %>
+
+                        <input
+                            type="hidden"
+                            name="search"
+                            value="<%= search %>">
+
+                    <% } %>
+
+                    <% if (category) { %>
+
+                        <input
+                            type="hidden"
+                            name="category"
+                            value="<%= category %>">
+                    
+                    <% } %>
+
+                    <label for="sort-filter">
+                        Sort by
+                    </label>
+
+                    <select
+                        id="sort-filter"
+                        name="sort"
+                        onchange="this.form.submit()">
+
+                        <option
+                            value="newest"
+                            <%= sort === "newest" ? "selected" : "" %>>
+                            Newest
+                        </option>
+
+                        <option
+                            value="popular"
+                            <%= sort === "popular" ? "selected" : "" %>>
+                            Most Viewed
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
 
             <div class="articles-grid">
 
@@ -76,9 +175,28 @@
 
                 <% } else { %>
 
-                    <p class="empty-state">
-                        No additional articles available.
-                    </p>
+                    <div class="empty-state">
+
+                        <% if (search) { %>
+
+                            <h3>No results found</h3>
+
+                            <p>
+                                We couldn't find any articles matching
+                                "<strong><%= search %></strong>".
+                            </p>
+
+                        <% } else { %>
+
+                            <h3>No articles available</h3>
+
+                            <p>
+                                There are currently no published articles.
+                            </p>
+
+                        <% } %>
+
+                    </div>
 
                 <% } %>
 

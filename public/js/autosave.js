@@ -40,13 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .map((field) => field.label);
     }
 
-
     function showStatus(message, type = "") {
         if (!saveStatus) return;
 
         saveStatus.textContent = message;
         saveStatus.className = "save-status";
-
         if (type) saveStatus.classList.add(`save-status-${type}`);
     }
 
@@ -150,6 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (activeSavePromise === saveOperation) activeSavePromise = null;
         return savedSuccessfully;
     }
+
     async function submitArticle() {
         clearTimeout(saveTimer);
 

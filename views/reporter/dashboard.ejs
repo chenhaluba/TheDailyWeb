@@ -2,35 +2,18 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %> | The Daily Web</title>
-
-    <link
-        rel="stylesheet"
-        href="/css/reporter.css"
-    >
+    <link rel="stylesheet" href="/css/reporter.css">
 </head>
-
 <body>
     <header class="site-header">
         <div class="header-content">
-            <a href="/" class="site-logo">
-                The Daily Web
-            </a>
+            <a href="/" class="site-logo">The Daily Web</a>
 
             <nav class="header-navigation">
-                <a href="/reporter/dashboard">
-                    הכתבות שלי
-                </a>
-
-                <a href="/logout" class="logout-link">
-                    התנתקות
-                </a>
+                <a href="/reporter/dashboard">הכתבות שלי</a>
+                <a href="/logout" class="logout-link">התנתקות</a>
             </nav>
         </div>
     </header>
@@ -38,55 +21,29 @@
     <main class="dashboard-container">
         <section class="dashboard-heading">
             <div>
-                <p class="dashboard-label">
-                    מערכת ניהול כתבות
-                </p>
-
+                <p class="dashboard-label">מערכת ניהול כתבות</p>
                 <h1>אזור הכתב</h1>
-
-                <p class="dashboard-description">
-                    כאן ניתן לצפות בכתבות שלך ולעקוב אחר מצב הטיפול בהן.
-                </p>
+                <p class="dashboard-description">כאן ניתן לצפות בכתבות שלך ולעקוב אחר מצב הטיפול בהן.</p>
             </div>
 
-            <a
-                href="/reporter/articles/new"
-                class="primary-button"
-            >
-                כתבה חדשה
-            </a>
+            <a href="/reporter/articles/new" class="primary-button">כתבה חדשה</a>
         </section>
 
         <% if (errorMessage) { %>
-            <div class="message message-error" role="alert">
-                <%= errorMessage %>
-            </div>
+            <div class="message message-error" role="alert"><%= errorMessage %></div>
         <% } %>
 
         <section class="articles-section">
             <div class="section-heading">
                 <h2>הכתבות שלי</h2>
-
-                <span class="articles-count">
-                    <%= articles.length %>
-                    <%= articles.length === 1 ? "כתבה" : "כתבות" %>
-                </span>
+                <span class="articles-count"><%= articles.length %> <%= articles.length === 1 ? "כתבה" : "כתבות" %></span>
             </div>
 
             <% if (articles.length === 0 && !errorMessage) { %>
                 <div class="empty-state">
                     <h3>עדיין אין לך כתבות</h3>
-
-                    <p>
-                        אפשר להתחיל ביצירת הכתבה הראשונה שלך.
-                    </p>
-
-                    <a
-                        href="/reporter/articles/new"
-                        class="primary-button"
-                    >
-                        יצירת כתבה
-                    </a>
+                    <p>אפשר להתחיל ביצירת הכתבה הראשונה שלך.</p>
+                    <a href="/reporter/articles/new" class="primary-button">יצירת כתבה</a>
                 </div>
             <% } %>
 
@@ -95,40 +52,22 @@
                     <% articles.forEach((article) => { %>
                         <article class="article-card">
                             <div class="article-card-header">
-                                <span
-                                    class="status-badge status-<%= article.statusClass %>"
-                                >
-                                    <%= article.statusLabel %>
-                                </span>
-
-                                <span class="saved-date">
-                                    נשמר לאחרונה:
-                                    <%= article.savedAt %>
-                                </span>
+                                <span class="status-badge status-<%= article.statusClass %>"><%= article.statusLabel %></span>
+                                <span class="saved-date">נשמר לאחרונה: <%= article.savedAt %></span>
                             </div>
 
-                            <h3 class="article-title">
-                                <%= article.title %>
-                            </h3>
+                            <h3 class="article-title"><%= article.title %></h3>
 
                             <% if (article.editorNote) { %>
                                 <div class="editor-note">
                                     <strong>הערת העורך</strong>
-
-                                    <p>
-                                        <%= article.editorNote %>
-                                    </p>
+                                    <p><%= article.editorNote %></p>
                                 </div>
                             <% } %>
 
                             <div class="article-card-actions">
                                 <% if (article.canEdit) { %>
-                                    <a
-                                        href="/reporter/articles/<%= article.id %>/edit"
-                                        class="secondary-button"
-                                    >
-                                        עריכת הכתבה
-                                    </a>
+                                    <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">עריכת הכתבה</a>
                                 <% } else if (article.canStartUpdate) { %>
                                     <button type="button" class="secondary-button start-update-button" data-article-id="<%= article.id %>">התחלת עדכון</button>
                                 <% } else { %>
@@ -141,6 +80,7 @@
             <% } %>
         </section>
     </main>
+
     <script src="/js/reporterDashboard.js"></script>
 </body>
 </html>

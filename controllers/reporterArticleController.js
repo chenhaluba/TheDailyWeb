@@ -81,14 +81,33 @@ function getValidationErrors(error) {
     return Object.values(error.errors).map((validationError) => validationError.message);
 }
 
+function validateArticleForSubmission(workingVersion) {
+    const requiredFields = [
+        { name: "title", label: "כותרת" },
+        { name: "summary", label: "תקציר" },
+        { name: "content", label: "תוכן" },
+        { name: "category", label: "קטגוריה" },
+        { name: "mainImage", label: "תמונה ראשית" }
+    ];
+
+    return requiredFields
+        .filter((field) => {
+            const value = workingVersion ? workingVersion[field.name] : null;
+            return typeof value !== "string" || !value.trim();
+        })
+        .map((field) => `השדה ${field.label} הוא שדה חובה`);
+}
+
 async function renderDashboard(req, res) {
     try {
-        const articles = await Article.find({ author: req.user.userID }).sort({ updatedAt: -1 }).lean();
-        const articlesForView = articles.map(createArticleViewModel);
+        const articles = await Article.find({ author: req.user.userID })
+            .select("_id status workingVersion.title workingVersion.savedAt publishedVersion.title editorNote updatedAt")
+            .sort({ updatedAt: -1 })
+            .lean();
 
         return res.render("reporter/dashboard", {
             pageTitle: "אזור הכתב",
-            articles: articlesForView,
+            articles: articles.map(createArticleViewModel),
             errorMessage: ""
         });
     } catch (error) {
@@ -272,23 +291,6 @@ async function saveReporterDraft(req, res) {
     }
 }
 
-function validateArticleForSubmission(workingVersion) {
-    const requiredFields = [
-        { name: "title", label: "כותרת" },
-        { name: "summary", label: "תקציר" },
-        { name: "content", label: "תוכן" },
-        { name: "category", label: "קטגוריה" },
-        { name: "mainImage", label: "תמונה ראשית" }
-    ];
-
-    return requiredFields
-        .filter((field) => {
-            const value = workingVersion ? workingVersion[field.name] : null;
-            return typeof value !== "string" || !value.trim();
-        })
-        .map((field) => `השדה ${field.label} הוא שדה חובה`);
-}
-
 async function submitReporterArticle(req, res) {
     const articleId = req.params.id;
 
@@ -366,17 +368,11 @@ async function startPublishedArticleUpdate(req, res) {
 
         article.status = "draft";
         article.editorNote = "";
-
         await article.save();
 
         return res.status(200).json({
             success: true,
-            data: {
-                article: {
-                    id: article._id.toString(),
-                    status: article.status
-                }
-            },
+            data: { article: { id: article._id.toString(), status: article.status } },
             message: "נוצרה גרסת עבודה חדשה לכתבה"
         });
     } catch (error) {

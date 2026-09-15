@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 headers: { "Accept": "application/json" }
             });
 
-            const result = await readResponse(response);
+            const result = await parseApiResponse(response);
             if (!result) return;
 
             if (!response.ok || !result.success) {

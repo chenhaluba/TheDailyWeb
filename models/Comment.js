@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema(
             type: String,
             trim: true,
             maxlength: 50,
-            default: "guest"
+            default: "אורח"
         },
 
         content: {

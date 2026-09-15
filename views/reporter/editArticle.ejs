@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +12,21 @@
             <a href="/" class="site-logo">The Daily Web</a>
 
             <nav class="header-navigation">
-                <a href="/reporter/dashboard">הכתבות שלי</a>
-                <a href="/logout" class="logout-link">התנתקות</a>
+                <a href="/reporter/dashboard">My Articles</a>
+                <a href="/logout" class="logout-link">Logout</a>
             </nav>
         </div>
     </header>
 
     <main class="editor-container">
         <div class="editor-navigation">
-            <a href="/reporter/dashboard" class="back-link">חזרה לכתבות שלי</a>
+            <a href="/reporter/dashboard" class="back-link">← Back to My Articles</a>
         </div>
 
         <section class="editor-heading">
             <div>
-                <p class="dashboard-label"><%= isNew ? "יצירת כתבה" : "ניהול כתבה" %></p>
-                <h1><%= isNew ? "כתבה חדשה" : (isEditable ? "עריכת כתבה" : "פרטי הכתבה") %></h1>
+                <p class="dashboard-label">Reporter Portal</p>
+                <h1><%= isNew ? "New Article" : (isEditable ? "Edit Article" : "Article Details") %></h1>
             </div>
 
             <% if (!isNew) { %>
@@ -36,54 +36,100 @@
 
         <% if (article.editorNote) { %>
             <div class="editor-note editor-page-note">
-                <strong>הערת העורך</strong>
+                <strong>Editor Note</strong>
                 <p><%= article.editorNote %></p>
             </div>
         <% } %>
 
         <% if (article.status === "pending") { %>
-            <div class="message message-information">הכתבה ממתינה לבדיקת העורך ולכן לא ניתן לערוך אותה כרגע.</div>
+            <div class="message message-information">
+                This article is awaiting editor review and cannot be edited right now.
+            </div>
         <% } %>
 
         <% if (article.status === "published") { %>
-            <div class="message message-information">זוהי הגרסה שפורסמה. כדי לערוך אותה, חזרו לכתבות שלי ובחרו באפשרות "התחלת עדכון".</div>
+            <div class="message message-information">
+                This is the currently published version. To make changes, go back to <a href="/reporter/dashboard" style="font-weight:600;text-decoration:underline">My Articles</a> and choose <strong>Start Update</strong>.
+            </div>
         <% } %>
 
         <section class="article-editor">
             <form id="article-form" data-article-id="<%= article.id %>" data-is-new="<%= isNew %>">
                 <div class="form-group">
-                    <label for="title">כותרת</label>
-                    <input type="text" id="title" name="title" maxlength="200" value="<%= article.workingVersion.title || "" %>" placeholder="הקלידו את כותרת הכתבה" <% if (!isEditable) { %>disabled<% } %>>
+                    <label for="title">Title</label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        maxlength="200"
+                        value="<%= article.workingVersion.title || "" %>"
+                        placeholder="Enter the article headline"
+                        <% if (!isEditable) { %>disabled<% } %>
+                    >
                 </div>
 
                 <div class="form-group">
-                    <label for="summary">תקציר</label>
-                    <textarea id="summary" name="summary" rows="4" maxlength="500" placeholder="כתבו תקציר קצר של הכתבה" <% if (!isEditable) { %>disabled<% } %>><%= article.workingVersion.summary || "" %></textarea>
-                    <span class="field-help">עד 500 תווים</span>
+                    <label for="summary">Summary</label>
+                    <textarea
+                        id="summary"
+                        name="summary"
+                        rows="3"
+                        maxlength="500"
+                        placeholder="A short description shown on the article card"
+                        <% if (!isEditable) { %>disabled<% } %>
+                    ><%= article.workingVersion.summary || "" %></textarea>
+                    <span class="field-help">Up to 500 characters</span>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="category">קטגוריה</label>
-                        <input type="text" id="category" name="category" maxlength="100" value="<%= article.workingVersion.category || "" %>" placeholder="לדוגמה: טכנולוגיה" <% if (!isEditable) { %>disabled<% } %>>
+                        <label for="category">Category</label>
+                        <input
+                            type="text"
+                            id="category"
+                            name="category"
+                            maxlength="100"
+                            value="<%= article.workingVersion.category || "" %>"
+                            placeholder="e.g. Technology, Sports"
+                            <% if (!isEditable) { %>disabled<% } %>
+                        >
                     </div>
 
                     <div class="form-group">
-                        <label for="mainImage">תמונה ראשית</label>
-                        <input type="text" id="mainImage" name="mainImage" value="<%= article.workingVersion.mainImage || "" %>" placeholder="כתובת התמונה או שם הקובץ" <% if (!isEditable) { %>disabled<% } %>>
+                        <label for="mainImage">Main Image URL</label>
+                        <input
+                            type="text"
+                            id="mainImage"
+                            name="mainImage"
+                            value="<%= article.workingVersion.mainImage || "" %>"
+                            placeholder="https://..."
+                            <% if (!isEditable) { %>disabled<% } %>
+                        >
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="content">תוכן הכתבה</label>
-                    <textarea id="content" name="content" rows="16" placeholder="כתבו כאן את תוכן הכתבה" <% if (!isEditable) { %>disabled<% } %>><%= article.workingVersion.content || "" %></textarea>
+                    <label for="content">Article Content</label>
+                    <textarea
+                        id="content"
+                        name="content"
+                        rows="18"
+                        placeholder="Write the full article here..."
+                        <% if (!isEditable) { %>disabled<% } %>
+                    ><%= article.workingVersion.content || "" %></textarea>
                 </div>
 
                 <% if (isEditable) { %>
                     <div class="form-actions">
-                        <button type="submit" id="save-button" class="primary-button"><%= isNew ? "יצירת טיוטה" : "שמירה עכשיו" %></button>
-                        <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>שליחה לאישור</button>
-                        <span id="save-status" class="save-status" aria-live="polite"><%= isNew ? "הטיוטה תיווצר אוטומטית בתחילת הכתיבה" : "כל השינויים נשמרו" %></span>
+                        <button type="submit" id="save-button" class="primary-button">
+                            <%= isNew ? "Create Draft" : "Save Now" %>
+                        </button>
+                        <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>
+                            Submit for Review
+                        </button>
+                        <span id="save-status" class="save-status" aria-live="polite">
+                            <%= isNew ? "Start writing — your draft is saved automatically" : "All changes saved" %>
+                        </span>
                     </div>
                 <% } %>
             </form>

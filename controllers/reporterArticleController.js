@@ -2,21 +2,21 @@ const mongoose = require("mongoose");
 const Article = require("../models/Article");
 
 const statusDetails = {
-    draft: { label: "בהכנה", cssClass: "draft" },
-    pending: { label: "ממתינה לאישור עורך", cssClass: "pending" },
-    published: { label: "פורסמה", cssClass: "published" },
-    returned: { label: "הוחזרה לתיקונים", cssClass: "returned" }
+    draft: { label: "Draft", cssClass: "draft" },
+    pending: { label: "Pending Review", cssClass: "pending" },
+    published: { label: "Published", cssClass: "published" },
+    returned: { label: "Returned for Revisions", cssClass: "returned" }
 };
 
 const allowedStatuses = Object.keys(statusDetails);
 
 function formatDate(date) {
-    if (!date) return "טרם נשמרה";
+    if (!date) return "Not saved yet";
 
     const parsedDate = new Date(date);
-    if (Number.isNaN(parsedDate.getTime())) return "טרם נשמרה";
+    if (Number.isNaN(parsedDate.getTime())) return "Not saved yet";
 
-    return new Intl.DateTimeFormat("he-IL", {
+    return new Intl.DateTimeFormat("en-US", {
         dateStyle: "short",
         timeStyle: "short"
     }).format(parsedDate);
@@ -46,7 +46,7 @@ function createArticleViewModel(article) {
 
     return {
         id: article._id.toString(),
-        title: workingVersion.title || publishedVersion.title || "כתבה ללא כותרת",
+        title: workingVersion.title || publishedVersion.title || "Untitled Article",
         status: article.status,
         statusLabel: status.label,
         statusClass: status.cssClass,
@@ -83,11 +83,11 @@ function getValidationErrors(error) {
 
 function validateArticleForSubmission(workingVersion) {
     const requiredFields = [
-        { name: "title", label: "כותרת" },
-        { name: "summary", label: "תקציר" },
-        { name: "content", label: "תוכן" },
-        { name: "category", label: "קטגוריה" },
-        { name: "mainImage", label: "תמונה ראשית" }
+        { name: "title", label: "Title" },
+        { name: "summary", label: "Summary" },
+        { name: "content", label: "Content" },
+        { name: "category", label: "Category" },
+        { name: "mainImage", label: "Main Image" }
     ];
 
     return requiredFields
@@ -95,7 +95,7 @@ function validateArticleForSubmission(workingVersion) {
             const value = workingVersion ? workingVersion[field.name] : null;
             return typeof value !== "string" || !value.trim();
         })
-        .map((field) => `השדה ${field.label} הוא שדה חובה`);
+        .map((field) => `${field.label} is required`);
 }
 
 async function renderDashboard(req, res) {
@@ -106,7 +106,7 @@ async function renderDashboard(req, res) {
             .lean();
 
         return res.render("reporter/dashboard", {
-            pageTitle: "אזור הכתב",
+            pageTitle: "Reporter Dashboard",
             articles: articles.map(createArticleViewModel),
             errorMessage: ""
         });
@@ -114,20 +114,20 @@ async function renderDashboard(req, res) {
         console.error("Failed to load reporter articles:", error.message);
 
         return res.status(500).render("reporter/dashboard", {
-            pageTitle: "אזור הכתב",
+            pageTitle: "Reporter Dashboard",
             articles: [],
-            errorMessage: "לא ניתן היה לטעון את הכתבות. נסו שוב מאוחר יותר."
+            errorMessage: "Failed to load articles. Please try again later."
         });
     }
 }
 
 function renderNewArticle(req, res) {
     return res.render("reporter/editArticle", {
-        pageTitle: "כתבה חדשה",
+        pageTitle: "New Article",
         article: {
             id: "",
             status: "draft",
-            statusLabel: "בהכנה",
+            statusLabel: statusDetails.draft.label,
             statusClass: "draft",
             workingVersion: { title: "", summary: "", content: "", category: "", mainImage: "" },
             publishedVersion: null,
@@ -142,27 +142,27 @@ async function renderEditArticle(req, res) {
     const articleId = req.params.id;
 
     if (!mongoose.isValidObjectId(articleId)) {
-        return res.status(404).render("notFound", { pageTitle: "הכתבה לא נמצאה" });
+        return res.status(404).render("notFound", { pageTitle: "Article Not Found" });
     }
 
     try {
         const article = await Article.findOne({ _id: articleId, author: req.user.userID }).lean();
 
         if (!article) {
-            return res.status(404).render("notFound", { pageTitle: "הכתבה לא נמצאה" });
+            return res.status(404).render("notFound", { pageTitle: "Article Not Found" });
         }
 
         const articleForView = serializeArticle(article);
 
         return res.render("reporter/editArticle", {
-            pageTitle: articleForView.workingVersion.title || "עריכת כתבה",
+            pageTitle: articleForView.workingVersion.title || "Edit Article",
             article: articleForView,
             isNew: false,
             isEditable: ["draft", "returned"].includes(article.status)
         });
     } catch (error) {
         console.error("Failed to load reporter article:", error.message);
-        return res.status(500).render("notFound", { pageTitle: "שגיאה בטעינת הכתבה" });
+        return res.status(500).render("notFound", { pageTitle: "Error Loading Article" });
     }
 }
 
@@ -170,7 +170,7 @@ async function getReporterArticles(req, res) {
     const requestedStatus = req.query.status;
 
     if (requestedStatus && (typeof requestedStatus !== "string" || !allowedStatuses.includes(requestedStatus))) {
-        return sendApiError(res, 400, "סטטוס הכתבה אינו תקין");
+        return sendApiError(res, 400, "Invalid article status");
     }
 
     try {
@@ -186,7 +186,7 @@ async function getReporterArticles(req, res) {
         });
     } catch (error) {
         console.error("Failed to get reporter articles:", error.message);
-        return sendApiError(res, 500, "לא ניתן היה לטעון את הכתבות");
+        return sendApiError(res, 500, "Failed to load articles");
     }
 }
 
@@ -194,14 +194,14 @@ async function getReporterArticleById(req, res) {
     const articleId = req.params.id;
 
     if (!mongoose.isValidObjectId(articleId)) {
-        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+        return sendApiError(res, 400, "Invalid article ID");
     }
 
     try {
         const article = await Article.findOne({ _id: articleId, author: req.user.userID }).lean();
 
         if (!article) {
-            return sendApiError(res, 404, "הכתבה לא נמצאה");
+            return sendApiError(res, 404, "Article not found");
         }
 
         return res.status(200).json({
@@ -211,7 +211,7 @@ async function getReporterArticleById(req, res) {
         });
     } catch (error) {
         console.error("Failed to get reporter article:", error.message);
-        return sendApiError(res, 500, "לא ניתן היה לטעון את הכתבה");
+        return sendApiError(res, 500, "Failed to load article");
     }
 }
 
@@ -227,16 +227,16 @@ async function createReporterArticle(req, res) {
         return res.status(201).json({
             success: true,
             data: { article: { id: article._id.toString(), status: article.status } },
-            message: "הטיוטה נוצרה בהצלחה"
+            message: "Draft created successfully"
         });
     } catch (error) {
         console.error("Failed to create reporter article:", error.message);
 
         if (error.name === "ValidationError") {
-            return sendApiError(res, 400, "הנתונים שהוזנו אינם תקינים", getValidationErrors(error));
+            return sendApiError(res, 400, "Invalid data provided", getValidationErrors(error));
         }
 
-        return sendApiError(res, 500, "לא ניתן היה ליצור את הכתבה");
+        return sendApiError(res, 500, "Failed to create article");
     }
 }
 
@@ -244,18 +244,18 @@ async function saveReporterDraft(req, res) {
     const articleId = req.params.id;
 
     if (!mongoose.isValidObjectId(articleId)) {
-        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+        return sendApiError(res, 400, "Invalid article ID");
     }
 
     try {
         const article = await Article.findOne({ _id: articleId, author: req.user.userID });
 
         if (!article) {
-            return sendApiError(res, 404, "הכתבה לא נמצאה");
+            return sendApiError(res, 404, "Article not found");
         }
 
         if (!["draft", "returned"].includes(article.status)) {
-            return sendApiError(res, 400, "לא ניתן לערוך כתבה במצב הנוכחי");
+            return sendApiError(res, 400, "Cannot edit an article in its current status");
         }
 
         const workingVersion = getVersionFromBody(req.body);
@@ -278,16 +278,16 @@ async function saveReporterDraft(req, res) {
                     savedAt: article.workingVersion.savedAt
                 }
             },
-            message: "הטיוטה נשמרה בהצלחה"
+            message: "Draft saved successfully"
         });
     } catch (error) {
         console.error("Failed to save reporter draft:", error.message);
 
         if (error.name === "ValidationError") {
-            return sendApiError(res, 400, "הנתונים שהוזנו אינם תקינים", getValidationErrors(error));
+            return sendApiError(res, 400, "Invalid data provided", getValidationErrors(error));
         }
 
-        return sendApiError(res, 500, "לא ניתן היה לשמור את הכתבה");
+        return sendApiError(res, 500, "Failed to save article");
     }
 }
 
@@ -295,24 +295,24 @@ async function submitReporterArticle(req, res) {
     const articleId = req.params.id;
 
     if (!mongoose.isValidObjectId(articleId)) {
-        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+        return sendApiError(res, 400, "Invalid article ID");
     }
 
     try {
         const article = await Article.findOne({ _id: articleId, author: req.user.userID });
 
         if (!article) {
-            return sendApiError(res, 404, "הכתבה לא נמצאה");
+            return sendApiError(res, 404, "Article not found");
         }
 
         if (!["draft", "returned"].includes(article.status)) {
-            return sendApiError(res, 400, "ניתן לשלוח לאישור רק כתבה שבהכנה או כתבה שהוחזרה לתיקונים");
+            return sendApiError(res, 400, "Only draft or returned articles can be submitted for review");
         }
 
         const validationErrors = validateArticleForSubmission(article.workingVersion);
 
         if (validationErrors.length > 0) {
-            return sendApiError(res, 400, "יש להשלים את כל שדות הכתבה לפני השליחה", validationErrors);
+            return sendApiError(res, 400, "Please complete all required fields before submitting", validationErrors);
         }
 
         article.status = "pending";
@@ -322,16 +322,16 @@ async function submitReporterArticle(req, res) {
         return res.status(200).json({
             success: true,
             data: { article: { id: article._id.toString(), status: article.status } },
-            message: "הכתבה נשלחה לאישור העורך"
+            message: "Article submitted for editor review"
         });
     } catch (error) {
         console.error("Failed to submit reporter article:", error.message);
 
         if (error.name === "ValidationError") {
-            return sendApiError(res, 400, "הנתונים שהוזנו אינם תקינים", getValidationErrors(error));
+            return sendApiError(res, 400, "Invalid data provided", getValidationErrors(error));
         }
 
-        return sendApiError(res, 500, "לא ניתן היה לשלוח את הכתבה לאישור");
+        return sendApiError(res, 500, "Failed to submit article for review");
     }
 }
 
@@ -339,22 +339,22 @@ async function startPublishedArticleUpdate(req, res) {
     const articleId = req.params.id;
 
     if (!mongoose.isValidObjectId(articleId)) {
-        return sendApiError(res, 400, "מזהה הכתבה אינו תקין");
+        return sendApiError(res, 400, "Invalid article ID");
     }
 
     try {
         const article = await Article.findOne({ _id: articleId, author: req.user.userID });
 
         if (!article) {
-            return sendApiError(res, 404, "הכתבה לא נמצאה");
+            return sendApiError(res, 404, "Article not found");
         }
 
         if (article.status !== "published") {
-            return sendApiError(res, 400, "לא ניתן להתחיל עדכון לכתבה במצב הנוכחי");
+            return sendApiError(res, 400, "Cannot start an update for an article in its current status");
         }
 
         if (!article.publishedVersion) {
-            return sendApiError(res, 400, "לכתבה אין גרסה שפורסמה");
+            return sendApiError(res, 400, "This article has no published version");
         }
 
         article.workingVersion = {
@@ -373,11 +373,11 @@ async function startPublishedArticleUpdate(req, res) {
         return res.status(200).json({
             success: true,
             data: { article: { id: article._id.toString(), status: article.status } },
-            message: "נוצרה גרסת עבודה חדשה לכתבה"
+            message: "Working version created for article"
         });
     } catch (error) {
         console.error("Failed to start published article update:", error.message);
-        return sendApiError(res, 500, "לא ניתן היה להתחיל את עדכון הכתבה");
+        return sendApiError(res, 500, "Failed to start article update");
     }
 }
 

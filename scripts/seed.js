@@ -896,6 +896,370 @@ const seedDatabase = async () =>{
                     }
                 ]
             },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
+            {
+                author: reporter._id,
+                status: "published",
+                publishedVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                workingVersion: {
+                    title: "Tech Giant Unveils Revolutionary Quantum Computer",
+                    summary: "The new quantum machine promises to solve complex problems in seconds, revolutionizing the tech industry.",
+                    content: "In a highly anticipated press conference today, the leading tech corporation announced their breakthrough in quantum computing. The new processor, boasting 1000 qubits, aims to tackle simulations that were previously impossible for classical computers. Experts believe this will change the fields of cryptography and medicine forever.",
+                    category: "Technology",
+                    mainImage: "quantum-launch.jpg"
+                },
+                totalViews: 1250,
+                publicationHistory: [
+                    {
+                        publishedAt: new Date(),
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    }
+                ]
+            },
 
 
             // 2. Draft Article

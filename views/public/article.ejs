@@ -9,6 +9,7 @@
 
     <link rel="stylesheet" href="/css/common.css">
     <link rel="stylesheet" href="/css/article.css">
+    <link rel="stylesheet" href="/css/comments.css">
 </head>
 
 <body>
@@ -67,9 +68,70 @@
 
         </article>
 
+        <section
+            id="comments-section"
+            class="comments-section"
+            data-article-id="<%= article._id %>">
+
+            <h2 class="comments-title">Comments</h2>
+
+            <p class="comments-intro">
+                Your name is optional when posting a comment.
+            </p>
+
+            <form id="comment-form" class="comment-form" novalidate>
+
+                <div class="comment-form-group">
+                    <label for="comment-author">
+                        Name <span class="optional-label">(optional)</span>
+                    </label>
+
+                    <input
+                        id="comment-author"
+                        name="authorName"
+                        type="text"
+                        maxlength="50"
+                        autocomplete="name">
+                </div>
+
+                <div class="comment-form-group">
+                    <label for="comment-content">Comment</label>
+
+                    <textarea
+                        id="comment-content"
+                        name="content"
+                        maxlength="1000"
+                        required
+                        aria-describedby="comment-limit"></textarea>
+
+                    <p id="comment-limit" class="comment-limit">
+                        Maximum 1000 characters.
+                    </p>
+                </div>
+
+                <button id="comment-submit" type="submit">
+                    Post Comment
+                </button>
+
+                <p
+                    id="comment-status"
+                    class="comment-status"
+                    role="status"
+                    aria-live="polite"></p>
+
+            </form>
+
+            <div id="comments-list" class="comments-list">
+                <p class="comments-list-message">Loading comments...</p>
+            </div>
+
+        </section>
+
     </main>
 
     <%- include("../partials/footer") %>
+
+    <script src="/js/comments.js" defer></script>
 
 </body>
 

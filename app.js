@@ -7,8 +7,9 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 
 const authRoutes = require("./routes/authRoutes");
-const pageRoutes = require("./routes/pageRoutes")
-const userRoutes = require("./routes/userRoutes");
+const pageRoutes = require("./routes/pageRoutes");
+const commentRoutes = require("./routes/commentRoutes");
+const articleRoutes = require("./routes/articleRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", authRoutes);
 app.use("/", pageRoutes);
+app.use("/", commentRoutes);
+app.use("/api/articles", articleRoutes);
 
 
 app.use("/user", userRoutes);

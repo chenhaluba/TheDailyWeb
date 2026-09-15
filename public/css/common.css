@@ -106,6 +106,43 @@ img {
     width: 100%;
 }
 
+.not-found {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.not-found h1 {
+    font-size: 5rem;
+    margin-bottom: 0.5rem;
+}
+
+.not-found h2 {
+    margin-bottom: 1rem;
+}
+
+.not-found p {
+    color: #666;
+    margin-bottom: 2rem;
+}
+
+.primary-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: #0d6efd;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+.primary-button:hover {
+    background: #0b5ed7;
+}
+
 
 
 @media (max-width:768px) {

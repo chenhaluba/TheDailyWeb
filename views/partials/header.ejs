@@ -17,12 +17,21 @@
                 "Science"
             ];
 
-            const searchQuery = search
-                ? `&search=${encodeURIComponent(search)}`
+            const currentSearch =
+                typeof search !== "undefined" ? search : "";
+
+            const currentCategory =
+                typeof category !== "undefined" ? category : "";
+
+            const currentSort =
+                typeof sort !== "undefined" ? sort : "";
+
+            const searchQuery = currentSearch
+                ? `&search=${encodeURIComponent(currentSearch)}`
                 : "";
 
-            const sortQuery = sort
-                ? `&sort=${sort}`
+            const sortQuery = currentSort
+                ? `&sort=${currentSort}`
                 : "";
         %>
 
@@ -30,7 +39,7 @@
 
             <a
                 href="/"
-                class="<%= !category ? 'active' : '' %>">
+                class="<%= !currentCategory ? 'active' : '' %>">
                 Home
             </a>
 
@@ -38,10 +47,8 @@
 
                 <a
                     href="/?category=<%= cat %><%= searchQuery %><%= sortQuery %>"
-                    class="<%= category === cat ? 'active' : '' %>">
-
+                    class="<%= currentCategory === cat ? 'active' : '' %>">
                     <%= cat %>
-
                 </a>
 
             <% }) %>
@@ -49,13 +56,10 @@
         </nav>
 
         <div class="user-actions">
-
             <a href="/login">Login</a>
-
             <a href="#">
                 My Profile
             </a>
-
         </div>
 
     </div>

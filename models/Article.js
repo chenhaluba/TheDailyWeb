@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const CONSTANTS = require("../config/constants");
 
 const articleVersionSchema = new mongoose.Schema(
     {
@@ -79,7 +78,7 @@ const articleSchema = new mongoose.Schema(
 
         status: {
             type: String,
-            enum: Object.values(CONSTANTS.ARTICLE_STATUS),
+            enum: ["draft", "pending", "published", "returned"],
             default: "draft"
         },
 

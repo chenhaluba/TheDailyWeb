@@ -39,6 +39,7 @@
 
             <a
                 href="/"
+                data-category=""
                 class="<%= !currentCategory ? 'active' : '' %>">
                 Home
             </a>
@@ -47,8 +48,11 @@
 
                 <a
                     href="/?category=<%= cat %><%= searchQuery %><%= sortQuery %>"
+                    data-category="<%= cat %>"
                     class="<%= currentCategory === cat ? 'active' : '' %>">
+
                     <%= cat %>
+
                 </a>
 
             <% }) %>
@@ -56,10 +60,15 @@
         </nav>
 
         <div class="user-actions">
-            <a href="/login">Login</a>
+
+            <a href="/login">
+                Login
+            </a>
+
             <a href="#">
                 My Profile
             </a>
+
         </div>
 
     </div>

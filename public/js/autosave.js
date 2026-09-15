@@ -66,19 +66,10 @@ document.addEventListener("DOMContentLoaded", () => {
         saveTimer = setTimeout(() => saveArticle(), 1200);
     }
 
-    async function readResponse(response) {
-        if (response.redirected && response.url.includes("/login")) {
-            window.location.href = "/login";
-            return null;
-        }
-
-        const contentType = response.headers.get("content-type") || "";
-
-        if (!contentType.includes("application/json")) {
-            throw new Error("The server returned an unexpected response");
-        }
-
-        return response.json();
+    function getSaveRequestConfig() {
+        const url = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
+        const method = isNew ? "POST" : "PATCH";
+        return { url, method };
     }
 
     async function saveArticle(force = false) {
@@ -93,13 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
         showStatus(isNew ? "Creating draft..." : "Saving...");
         setButtonsDisabled(true);
 
-        const requestUrl = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
-        const requestMethod = isNew ? "POST" : "PATCH";
+        const { url, method } = getSaveRequestConfig();
 
         const saveOperation = (async () => {
             try {
-                const response = await fetch(requestUrl, {
-                    method: requestMethod,
+                const response = await fetch(url, {
+                    method,
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json"
@@ -108,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     keepalive: true
                 });
 
-                const result = await readResponse(response);
+                const result = await parseApiResponse(response);
                 if (!result) return false;
 
                 if (!response.ok || !result.success) {
@@ -194,11 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
     function saveBeforeLeaving() {
         if (!isDirty || activeSavePromise) return;
 
-        const requestUrl = isNew ? "/api/reporter/articles" : `/api/reporter/articles/${articleId}/draft`;
-        const requestMethod = isNew ? "POST" : "PATCH";
+        const { url, method } = getSaveRequestConfig();
 
-        fetch(requestUrl, {
-            method: requestMethod,
+        fetch(url, {
+            method,
             headers: {
                 "Content-Type": "application/json",
                 "Accept": "application/json"

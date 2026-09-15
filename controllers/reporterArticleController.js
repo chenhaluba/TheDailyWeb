@@ -258,14 +258,7 @@ async function saveReporterDraft(req, res) {
             return sendApiError(res, 400, "Cannot edit an article in its current status");
         }
 
-        const workingVersion = getVersionFromBody(req.body);
-
-        article.workingVersion.title = workingVersion.title;
-        article.workingVersion.summary = workingVersion.summary;
-        article.workingVersion.content = workingVersion.content;
-        article.workingVersion.category = workingVersion.category;
-        article.workingVersion.mainImage = workingVersion.mainImage;
-        article.workingVersion.savedAt = workingVersion.savedAt;
+        article.set("workingVersion", getVersionFromBody(req.body));
 
         await article.save();
 

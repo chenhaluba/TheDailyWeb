@@ -31,6 +31,7 @@ app.use("/", commentRoutes);
 app.use("/api/articles", articleRoutes);
 
 
+app.use("/user", userRoutes);
 app.use((req, res) => {
     res.status(404).render("notFound", {
         pageTitle: "Page Not Found"

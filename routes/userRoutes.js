@@ -5,15 +5,14 @@ const { createUser, deleteUser, getAllUsers, getUser, updateUser } = require('..
 const { validateSession } = require('../middleware/authMiddleware');
 const { validateRole } = require('../middleware/roleMiddleware');
 
+router.get('/', validateSession, validateRole('editor'), getAllUsers);
 
-//router.get('/users', validateSession, validateRole('editor'), getAllUsers);
+router.get('/:username', validateSession, validateRole('editor'), getUser);
 
-router.get('/user/:username', validateSession, validateRole('editor'), getUser);
+router.post('/', validateSession, validateRole('editor'), createUser);
 
-router.post('/user', validateSession, validateRole('editor'), createUser);
+router.put('/', validateSession, validateRole('editor'), updateUser);
 
-router.put('/user', validateSession, validateRole('editor'), updateUser);
-
-router.delete('/user', validateSession, validateRole('editor'), deleteUser);
-
+router.delete('/', validateSession, validateRole('editor'), deleteUser);
+saddsa
 module.exports = router;

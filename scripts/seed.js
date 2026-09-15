@@ -6,7 +6,7 @@ const User = require("../models/User");
 const Article = require("../models/Article");
 
 const names = ["yuval", "noy", "chen", "shirK", "shirA"];
-const categories = ["Technology", "Politics", "Sports", "Entertainment", "Health", "Economy", "Science"];
+const categories = ["News", "Economy", "Politics", "Sports", "Culture", "Technology", "Science"];
 
 // Helper to pick a random item from an array
 const sample = (arr) => arr[Math.floor(Math.random() * arr.length)];

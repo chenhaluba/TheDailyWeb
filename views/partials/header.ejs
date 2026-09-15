@@ -1,0 +1,63 @@
+<header class="site-header">
+
+    <div class="container">
+
+        <div class="logo">
+            <a href="/">The Daily Web</a>
+        </div>
+
+        <%
+            const categories = [
+                "News",
+                "Economy",
+                "Politics",
+                "Sports",
+                "Culture",
+                "Technology",
+                "Science"
+            ];
+
+            const searchQuery = search
+                ? `&search=${encodeURIComponent(search)}`
+                : "";
+
+            const sortQuery = sort
+                ? `&sort=${sort}`
+                : "";
+        %>
+
+        <nav class="main-nav">
+
+            <a
+                href="/"
+                class="<%= !category ? 'active' : '' %>">
+                Home
+            </a>
+
+            <% categories.forEach(cat => { %>
+
+                <a
+                    href="/?category=<%= cat %><%= searchQuery %><%= sortQuery %>"
+                    class="<%= category === cat ? 'active' : '' %>">
+
+                    <%= cat %>
+
+                </a>
+
+            <% }) %>
+
+        </nav>
+
+        <div class="user-actions">
+
+            <a href="/login">Login</a>
+
+            <a href="#">
+                My Profile
+            </a>
+
+        </div>
+
+    </div>
+
+</header>

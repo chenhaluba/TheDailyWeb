@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const pageRoutes = require("./routes/pageRoutes");
 const reporterPageRoutes = require("./routes/reporterPageRoutes");
 const reporterArticleRoutes = require("./routes/reporterArticleRoutes");
+const commentRoutes = require("./routes/commentRoutes");
+const articleRoutes = require("./routes/articleRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +28,8 @@ app.use("/", authRoutes);
 app.use("/reporter", reporterPageRoutes);
 app.use("/api/reporter/articles", reporterArticleRoutes);
 app.use("/", pageRoutes);
+app.use("/", commentRoutes);
+app.use("/api/articles", articleRoutes);
 
 app.use((req, res) => {
     res.status(404).render("notFound", { pageTitle: "Page Not Found" });

@@ -14,5 +14,4 @@ router.post('/', validateSession, validateRole('editor'), createUser);
 router.put('/', validateSession, validateRole('editor'), updateUser);
 
 router.delete('/', validateSession, validateRole('editor'), deleteUser);
-saddsa
 module.exports = router;

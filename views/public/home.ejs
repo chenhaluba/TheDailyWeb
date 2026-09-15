@@ -36,7 +36,7 @@
 
         <% } %>
 
-        <!-- Search -->
+        <!-- filters -->
         <section id="filters-section">
 
             <form id="search-form" method="GET" action="/">
@@ -47,27 +47,21 @@
                     name="search"
                     value="<%= search || '' %>"
                     placeholder="Search by title...">
-
-                <% if (sort) { %>
-                    <input
-                        type="hidden"
-                        name="sort"
-                        value="<%= sort %>">
-                <% } %>
-
-                <% if (category) { %>
-                    <input
-                        type="hidden"
-                        name="category"
-                        value="<%= category %>">
-                <% } %>
-
+            
+                <input
+                    id="category-input"
+                    type="hidden"
+                    name="category"
+                    value="<%= category || "" %>">
+            
                 <button
                     id="search-button"
                     type="submit">
+            
                     🔍 Search
+            
                 </button>
-
+            
             </form>
 
         </section>
@@ -141,23 +135,22 @@
                     </label>
 
                     <select
-                        id="sort-filter"
-                        name="sort"
-                        onchange="this.form.submit()">
-
-                        <option
-                            value="newest"
-                            <%= sort === "newest" ? "selected" : "" %>>
-                            Newest
-                        </option>
-
-                        <option
-                            value="popular"
-                            <%= sort === "popular" ? "selected" : "" %>>
-                            Most Viewed
-                        </option>
-
-                    </select>
+                    id="sort-filter"
+                    name="sort">
+                
+                    <option
+                        value="newest"
+                        <%= sort === "newest" ? "selected" : "" %>>
+                        Newest
+                    </option>
+                
+                    <option
+                        value="popular"
+                        <%= sort === "popular" ? "selected" : "" %>>
+                        Most Viewed
+                    </option>
+                
+                </select>
 
                 </form>
 
@@ -202,12 +195,14 @@
 
             </div>
 
+            <div id="feed-sentinel"></div>
+
         </section>
 
     </main>
 
     <%- include("../partials/footer") %>
-
+    <script src="/js/feed.js" defer></script>
 </body>
 
 </html>

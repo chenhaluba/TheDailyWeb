@@ -6,6 +6,7 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 
+const editorArticleRoutes = require("./routes/editorArticleRoutes");
 const authRoutes = require("./routes/authRoutes");
 const pageRoutes = require("./routes/pageRoutes");
 const commentRoutes = require("./routes/commentRoutes");
@@ -30,6 +31,7 @@ app.use("/", authRoutes);
 app.use("/", pageRoutes);
 app.use("/", commentRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/", editorArticleRoutes);
 
 
 app.use("/user", userRoutes);

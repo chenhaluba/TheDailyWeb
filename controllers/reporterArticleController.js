@@ -4,6 +4,7 @@ const {
     getVersionFromBody,
     validateCategory,
     validateArticleForSubmission,
+    hasArticleVersionChanged,
     isEditableStatus,
     serializeArticle,
     isValidArticleId,
@@ -97,6 +98,15 @@ async function saveReporterDraft(req, res) {
         if (!article) return sendApiError(res, 404, "Article not found");
         if (!isEditableStatus(article.status)) {
             return sendApiError(res, 400, "Cannot edit an article in its current status");
+        }
+
+        if (!hasArticleVersionChanged(article.workingVersion, workingVersion)) {
+            return sendSuccess(
+                res,
+                200,
+                { article: { id: article._id.toString(), status: article.status, savedAt: article.workingVersion.savedAt } },
+                "No changes to save"
+            );
         }
 
         article.workingVersion = workingVersion;

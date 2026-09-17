@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function scheduleSave() {
         clearTimeout(saveTimer);
-        saveTimer = setTimeout(saveArticle, 1200);
+        saveTimer = setTimeout(saveArticle, 1000);
     }
 
     function getSaveRequest() {
@@ -101,12 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
             : { url: `/api/reporter/articles/${articleId}/draft`, method: "PATCH" };
     }
 
-    async function saveArticle(force = false) {
+    async function saveArticle(allowEmptyCreate = false) {
         if (activeSavePromise) await activeSavePromise;
 
         const currentData = getFormData();
         const currentSnapshot = JSON.stringify(currentData);
-        if (!force && (!isDirty || currentSnapshot === lastSavedSnapshot)) return true;
+        const hasChanges = currentSnapshot !== lastSavedSnapshot;
+        const shouldCreateEmptyDraft = isNew && allowEmptyCreate;
+
+        if (!hasChanges && !shouldCreateEmptyDraft) return true;
 
         clearTimeout(saveTimer);
         showStatus(isNew ? "Creating draft..." : "Saving...");
@@ -163,7 +166,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         if (!window.confirm("Submit this article for editor review?")) return;
 
-        const savedSuccessfully = await saveArticle(true);
+        const savedSuccessfully = await saveArticle();
         if (!savedSuccessfully || !articleId) return;
 
         setButtonsDisabled(true);
@@ -201,17 +204,17 @@ document.addEventListener("DOMContentLoaded", () => {
         isDirty = JSON.stringify(getFormData()) !== lastSavedSnapshot;
         if (!isDirty) {
             clearTimeout(saveTimer);
-            showStatus("All changes saved", "success");
+            showStatus("");
             return;
         }
-        showStatus("Unsaved changes");
+        showStatus("");
         scheduleSave();
     });
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
         isDirty = JSON.stringify(getFormData()) !== lastSavedSnapshot;
-        await saveArticle(true);
+        await saveArticle(isNew);
     });
 
     if (submitButton) submitButton.addEventListener("click", submitArticle);

@@ -84,9 +84,9 @@
 
                 <% if (isEditable) { %>
                     <div class="form-actions">
-                        <button type="submit" id="save-button" class="primary-button"><%= isNew ? "Create Draft" : "Save Now" %></button>
+                        <button type="submit" id="save-button" class="secondary-button"><%= isNew ? "Create Draft" : "Save Now" %></button>
                         <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>Submit for Review</button>
-                        <span id="save-status" class="save-status" aria-live="polite"><%= isNew ? "Start writing — your draft is saved automatically" : "All changes saved" %></span>
+                        <span id="save-status" class="save-status" aria-live="polite"></span>
                     </div>
                 <% } %>
             </form>

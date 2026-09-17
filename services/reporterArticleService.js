@@ -4,6 +4,7 @@ const CONSTANTS = require("../config/constants");
 
 const { ARTICLE_STATUS, CATEGORIES } = CONSTANTS;
 const editableStatuses = [ARTICLE_STATUS.DRAFT, ARTICLE_STATUS.RETURNED];
+const versionFields = ["title", "summary", "content", "category", "mainImage"];
 const statusDetails = {
     [ARTICLE_STATUS.DRAFT]: { label: "Draft", cssClass: "draft" },
     [ARTICLE_STATUS.PENDING]: { label: "Pending Review", cssClass: "pending" },
@@ -51,6 +52,14 @@ function validateArticleForSubmission(version = {}) {
         .filter(({ name }) => typeof version[name] !== "string" || !version[name].trim())
         .map(({ label }) => `${label} is required`);
     return errors.concat(validateCategory(version.category));
+}
+
+function hasArticleVersionChanged(existingVersion = {}, newVersion = {}) {
+    return versionFields.some((field) => {
+        const existingValue = existingVersion[field] || "";
+        const newValue = newVersion[field] || "";
+        return existingValue !== newValue;
+    });
 }
 
 function isEditableStatus(status) {
@@ -124,6 +133,7 @@ module.exports = {
     getVersionFromBody,
     validateCategory,
     validateArticleForSubmission,
+    hasArticleVersionChanged,
     isEditableStatus,
     serializeArticle,
     getDashboardData,

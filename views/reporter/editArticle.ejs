@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %> | The Daily Web</title>
     <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/reporterEditor.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="header-content">
-            <a href="/" class="site-logo">The Daily Web</a>
-
-            <nav class="header-navigation">
-                <a href="/reporter/dashboard">My Articles</a>
-                <a href="/logout" class="logout-link">Logout</a>
-            </nav>
-        </div>
-    </header>
+    <%- include("partials/header", { activePage: "" }) %>
 
     <main class="editor-container">
         <div class="editor-navigation">
@@ -28,108 +20,73 @@
                 <p class="dashboard-label">Reporter Portal</p>
                 <h1><%= isNew ? "New Article" : (isEditable ? "Edit Article" : "Article Details") %></h1>
             </div>
-
             <% if (!isNew) { %>
                 <span class="status-badge status-<%= article.statusClass %>"><%= article.statusLabel %></span>
             <% } %>
         </section>
 
         <% if (article.editorNote) { %>
-            <div class="editor-note editor-page-note">
-                <strong>Editor Note</strong>
-                <p><%= article.editorNote %></p>
-            </div>
+            <%- include("partials/editorNote", { note: article.editorNote, pageNote: true }) %>
         <% } %>
 
         <% if (article.status === "pending") { %>
-            <div class="message message-information">
-                This article is awaiting editor review and cannot be edited right now.
-            </div>
+            <div class="message message-information">This article is awaiting editor review and cannot be edited right now.</div>
         <% } %>
-
         <% if (article.status === "published") { %>
             <div class="message message-information">
-                This is the currently published version. To make changes, go back to <a href="/reporter/dashboard" style="font-weight:600;text-decoration:underline">My Articles</a> and choose <strong>Start Update</strong>.
+                This is the currently published version. To make changes, return to
+                <a href="/reporter/dashboard" class="inline-link">My Articles</a> and choose <strong>Start Update</strong>.
             </div>
         <% } %>
 
         <section class="article-editor">
             <form id="article-form" data-article-id="<%= article.id %>" data-is-new="<%= isNew %>">
+                <div id="validation-summary" class="validation-summary" role="alert" hidden></div>
+
                 <div class="form-group">
                     <label for="title">Title</label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        maxlength="200"
-                        value="<%= article.workingVersion.title || "" %>"
-                        placeholder="Enter the article headline"
-                        <% if (!isEditable) { %>disabled<% } %>
-                    >
+                    <input type="text" id="title" name="title" maxlength="200" value="<%= article.workingVersion.title || '' %>" placeholder="Enter the article headline" aria-describedby="title-error" <%= isEditable ? "" : "disabled" %>>
+                    <span id="title-error" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <div class="form-group">
                     <label for="summary">Summary</label>
-                    <textarea
-                        id="summary"
-                        name="summary"
-                        rows="3"
-                        maxlength="500"
-                        placeholder="A short description shown on the article card"
-                        <% if (!isEditable) { %>disabled<% } %>
-                    ><%= article.workingVersion.summary || "" %></textarea>
-                    <span class="field-help">Up to 500 characters</span>
+                    <textarea id="summary" name="summary" rows="3" maxlength="500" placeholder="A short description shown on the article card" aria-describedby="summary-help summary-error" <%= isEditable ? "" : "disabled" %>><%= article.workingVersion.summary || "" %></textarea>
+                    <span id="summary-help" class="field-help">Up to 500 characters</span>
+                    <span id="summary-error" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="category">Category</label>
-                        <input
-                            type="text"
-                            id="category"
-                            name="category"
-                            maxlength="100"
-                            value="<%= article.workingVersion.category || "" %>"
-                            placeholder="e.g. Technology, Sports"
-                            <% if (!isEditable) { %>disabled<% } %>
-                        >
+                        <select id="category" name="category" aria-describedby="category-error" <%= isEditable ? "" : "disabled" %>>
+                            <option value="">Select a category</option>
+                            <% categories.forEach((category) => { %>
+                                <option value="<%= category %>" <%= article.workingVersion.category === category ? "selected" : "" %>><%= category %></option>
+                            <% }); %>
+                        </select>
+                        <span id="category-error" class="field-error" aria-live="polite"></span>
                     </div>
 
                     <div class="form-group">
-                        <label for="mainImage">Main Image URL</label>
-                        <input
-                            type="text"
-                            id="mainImage"
-                            name="mainImage"
-                            value="<%= article.workingVersion.mainImage || "" %>"
-                            placeholder="https://..."
-                            <% if (!isEditable) { %>disabled<% } %>
-                        >
+                        <label for="mainImage">Main Image File Name</label>
+                        <input type="text" id="mainImage" name="mainImage" value="<%= article.workingVersion.mainImage || '' %>" placeholder="e.g. image1.jpg" aria-describedby="mainImage-help mainImage-error" <%= isEditable ? "" : "disabled" %>>
+                        <span id="mainImage-help" class="field-help">Use a file located in public/images.</span>
+                        <span id="mainImage-error" class="field-error" aria-live="polite"></span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="content">Article Content</label>
-                    <textarea
-                        id="content"
-                        name="content"
-                        rows="18"
-                        placeholder="Write the full article here..."
-                        <% if (!isEditable) { %>disabled<% } %>
-                    ><%= article.workingVersion.content || "" %></textarea>
+                    <textarea id="content" name="content" rows="18" placeholder="Write the full article here..." aria-describedby="content-error" <%= isEditable ? "" : "disabled" %>><%= article.workingVersion.content || "" %></textarea>
+                    <span id="content-error" class="field-error" aria-live="polite"></span>
                 </div>
 
                 <% if (isEditable) { %>
                     <div class="form-actions">
-                        <button type="submit" id="save-button" class="primary-button">
-                            <%= isNew ? "Create Draft" : "Save Now" %>
-                        </button>
-                        <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>
-                            Submit for Review
-                        </button>
-                        <span id="save-status" class="save-status" aria-live="polite">
-                            <%= isNew ? "Start writing — your draft is saved automatically" : "All changes saved" %>
-                        </span>
+                        <button type="submit" id="save-button" class="primary-button"><%= isNew ? "Create Draft" : "Save Now" %></button>
+                        <button type="button" id="submit-button" class="submit-button" <%= isNew ? "hidden" : "" %>>Submit for Review</button>
+                        <span id="save-status" class="save-status" aria-live="polite"><%= isNew ? "Start writing — your draft is saved automatically" : "All changes saved" %></span>
                     </div>
                 <% } %>
             </form>

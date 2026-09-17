@@ -5,13 +5,12 @@ const {
     renderDashboard,
     renderNewArticle,
     renderEditArticle
-} = require("../controllers/reporterArticleController");
+} = require("../controllers/reporterPageController");
 
 const router = express.Router();
 
 router.use(validateSession);
 router.use(validateRole("reporter"));
-
 router.get("/dashboard", renderDashboard);
 router.get("/articles/new", renderNewArticle);
 router.get("/articles/:id/edit", renderEditArticle);

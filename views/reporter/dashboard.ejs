@@ -5,18 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= pageTitle %> | The Daily Web</title>
     <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/reporterDashboard.css">
 </head>
 <body>
-    <header class="site-header">
-        <div class="header-content">
-            <a href="/" class="site-logo">The Daily Web</a>
-
-            <nav class="header-navigation">
-                <a href="/reporter/dashboard">My Articles</a>
-                <a href="/logout" class="logout-link">Logout</a>
-            </nav>
-        </div>
-    </header>
+    <%- include("partials/header", { activePage: "dashboard" }) %>
 
     <main class="dashboard-container">
         <section class="dashboard-heading">
@@ -25,7 +17,6 @@
                 <h1>My Articles</h1>
                 <p class="dashboard-description">Track your articles and their editorial status.</p>
             </div>
-
             <a href="/reporter/articles/new" class="primary-button">+ New Article</a>
         </section>
 
@@ -33,28 +24,21 @@
             <div class="message message-error" role="alert"><%= errorMessage %></div>
         <% } %>
 
-        <%
-            const draftCount     = articles.filter(a => a.status === "draft").length;
-            const pendingCount   = articles.filter(a => a.status === "pending").length;
-            const publishedCount = articles.filter(a => a.status === "published").length;
-            const returnedCount  = articles.filter(a => a.status === "returned").length;
-        %>
-
         <div class="stats-row">
             <div class="stat-card stat-card--draft">
-                <span class="stat-value"><%= draftCount %></span>
+                <span class="stat-value"><%= statusCounts.draft %></span>
                 <span class="stat-label">Draft</span>
             </div>
             <div class="stat-card stat-card--pending">
-                <span class="stat-value"><%= pendingCount %></span>
+                <span class="stat-value"><%= statusCounts.pending %></span>
                 <span class="stat-label">Pending Review</span>
             </div>
             <div class="stat-card stat-card--published">
-                <span class="stat-value"><%= publishedCount %></span>
+                <span class="stat-value"><%= statusCounts.published %></span>
                 <span class="stat-label">Published</span>
             </div>
             <div class="stat-card stat-card--returned">
-                <span class="stat-value"><%= returnedCount %></span>
+                <span class="stat-value"><%= statusCounts.returned %></span>
                 <span class="stat-label">Needs Revision</span>
             </div>
         </div>
@@ -65,7 +49,7 @@
                 <span class="articles-count"><%= articles.length %> <%= articles.length === 1 ? "article" : "articles" %></span>
             </div>
 
-            <% if (articles.length === 0 && !errorMessage) { %>
+            <% if (!articles.length && !errorMessage) { %>
                 <div class="empty-state">
                     <h3>No articles yet</h3>
                     <p>Create your first article and it will appear here once you start writing.</p>
@@ -73,34 +57,10 @@
                 </div>
             <% } %>
 
-            <% if (articles.length > 0) { %>
+            <% if (articles.length) { %>
                 <div class="articles-grid">
                     <% articles.forEach((article) => { %>
-                        <article class="article-card article-card--<%= article.statusClass %>">
-                            <div class="article-card-header">
-                                <span class="status-badge status-<%= article.statusClass %>"><%= article.statusLabel %></span>
-                                <span class="saved-date">Saved <%= article.savedAt %></span>
-                            </div>
-
-                            <h3 class="article-title"><%= article.title %></h3>
-
-                            <% if (article.editorNote) { %>
-                                <div class="editor-note">
-                                    <strong>Editor Note</strong>
-                                    <p><%= article.editorNote %></p>
-                                </div>
-                            <% } %>
-
-                            <div class="article-card-actions">
-                                <% if (article.canEdit) { %>
-                                    <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">Edit</a>
-                                <% } else if (article.canStartUpdate) { %>
-                                    <button type="button" class="secondary-button start-update-button" data-article-id="<%= article.id %>">Start Update</button>
-                                <% } else { %>
-                                    <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">View</a>
-                                <% } %>
-                            </div>
-                        </article>
+                        <%- include("partials/articleCard", { article }) %>
                     <% }); %>
                 </div>
             <% } %>

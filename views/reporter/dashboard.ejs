@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> | The Daily Web</title>
+    <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/reporterDashboard.css">
+</head>
+<body>
+    <%- include("partials/header", { activePage: "dashboard" }) %>
+
+    <main class="dashboard-container">
+        <section class="dashboard-heading">
+            <div>
+                <p class="dashboard-label">Reporter Portal</p>
+                <h1>My Articles</h1>
+                <p class="dashboard-description">Track your articles and their editorial status.</p>
+            </div>
+            <a href="/reporter/articles/new" class="primary-button">+ New Article</a>
+        </section>
+
+        <% if (errorMessage) { %>
+            <div class="message message-error" role="alert"><%= errorMessage %></div>
+        <% } %>
+
+        <div class="stats-row">
+            <div class="stat-card stat-card--draft">
+                <span class="stat-value"><%= statusCounts.draft %></span>
+                <span class="stat-label">Draft</span>
+            </div>
+            <div class="stat-card stat-card--pending">
+                <span class="stat-value"><%= statusCounts.pending %></span>
+                <span class="stat-label">Pending Review</span>
+            </div>
+            <div class="stat-card stat-card--published">
+                <span class="stat-value"><%= statusCounts.published %></span>
+                <span class="stat-label">Published</span>
+            </div>
+            <div class="stat-card stat-card--returned">
+                <span class="stat-value"><%= statusCounts.returned %></span>
+                <span class="stat-label">Needs Revision</span>
+            </div>
+        </div>
+
+        <section class="articles-section">
+            <div class="section-heading">
+                <h2>All Articles</h2>
+                <span class="articles-count"><%= articles.length %> <%= articles.length === 1 ? "article" : "articles" %></span>
+            </div>
+
+            <% if (!articles.length && !errorMessage) { %>
+                <div class="empty-state">
+                    <h3>No articles yet</h3>
+                    <p>Create your first article and it will appear here once you start writing.</p>
+                    <a href="/reporter/articles/new" class="primary-button">Create Your First Article</a>
+                </div>
+            <% } %>
+
+            <% if (articles.length) { %>
+                <div class="articles-grid">
+                    <% articles.forEach((article) => { %>
+                        <%- include("partials/articleCard", { article }) %>
+                    <% }); %>
+                </div>
+            <% } %>
+        </section>
+    </main>
+
+    <script src="/js/reporterUtils.js"></script>
+    <script src="/js/reporterDashboard.js"></script>
+</body>
+</html>

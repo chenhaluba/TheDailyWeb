@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= pageTitle %> | The Daily Web</title>
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/reporterDashboard.css">
+    <link rel="stylesheet" href="/css/analytics.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="header-content">
+            <div class="site-identity">
+                <a href="/" class="site-logo">The Daily Web</a>
+                <span class="area-name">Editor Area</span>
+            </div>
+            <nav class="header-navigation" aria-label="Editor navigation">
+                <a href="/">Public Home</a>
+                <a href="/editor">Dashboard</a>
+                <a href="/logout" class="logout-link">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="dashboard-container analytics-container">
+        <section class="dashboard-heading">
+            <div>
+                <p class="dashboard-label">Editor Portal</p>
+                <h1>Impact Analytics</h1>
+                <p class="dashboard-description">Review article views and publication activity over time.</p>
+            </div>
+        </section>
+
+        <section class="analytics-filter-section" aria-labelledby="analytics-filters-heading">
+            <h2 id="analytics-filters-heading">Analytics filters</h2>
+
+            <form id="analytics-filters">
+                <div class="form-group">
+                    <label for="article-select">Article</label>
+                    <select id="article-select" name="articleId">
+                        <option value="">Select an article</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="analytics-from">From</label>
+                    <input type="datetime-local" id="analytics-from" name="from">
+                </div>
+
+                <div class="form-group">
+                    <label for="analytics-to">To</label>
+                    <input type="datetime-local" id="analytics-to" name="to">
+                </div>
+
+                <button type="submit" id="load-analytics" class="primary-button">Load analytics</button>
+            </form>
+        </section>
+
+        <p id="analytics-loading" aria-live="polite" hidden>Loading analytics...</p>
+        <div id="analytics-error" class="message message-error" role="alert" hidden></div>
+
+        <div id="analytics-empty" class="empty-state">
+            <p>Select an article to view its analytics.</p>
+        </div>
+
+        <section id="analytics-results" aria-labelledby="analytics-article-title" hidden>
+            <h2 id="analytics-article-title"></h2>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-label">Views in selected range</span>
+                    <span id="analytics-total-views" class="stat-value">0</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">Publications</span>
+                    <span id="analytics-publication-count" class="stat-value">0</span>
+                </div>
+            </div>
+
+            <section class="analytics-chart-section" aria-labelledby="views-chart-heading">
+                <h3 id="views-chart-heading">Views over time</h3>
+                <canvas id="views-chart">A chart showing article views over time.</canvas>
+            </section>
+
+            <section class="publication-activity" aria-labelledby="publication-activity-heading">
+                <h3 id="publication-activity-heading">Publication activity</h3>
+                <ul id="publication-list"></ul>
+            </section>
+        </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="/js/analytics.js" defer></script>
+</body>
+</html>

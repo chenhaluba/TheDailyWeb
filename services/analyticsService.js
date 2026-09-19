@@ -178,6 +178,12 @@ async function updateStatistic(id, updates = {}) {
         validatedUpdates.bucketStart = bucketStart;
     }
 
+    const previousStatistic = await ViewStatistic.findById(id);
+
+    if (!previousStatistic) {
+        throw createAnalyticsError("View statistic not found", 404);
+    }
+
     const statistic = await ViewStatistic.findByIdAndUpdate(
         id,
         {
@@ -193,6 +199,31 @@ async function updateStatistic(id, updates = {}) {
         throw createAnalyticsError("View statistic not found", 404);
     }
 
+    if (
+        fields.includes("viewCount") &&
+        statistic.viewCount !== previousStatistic.viewCount
+    ) {
+        const viewCountDifference =
+            statistic.viewCount - previousStatistic.viewCount;
+
+        await Article.updateOne(
+            { _id: statistic.article },
+            [
+                {
+                    $set: {
+                        totalViews: {
+                            $max: [
+                                0,
+                                { $add: ["$totalViews", viewCountDifference] }
+                            ]
+                        }
+                    }
+                }
+            ],
+            { updatePipeline: true }
+        );
+    }
+
     return statistic;
 }
 
@@ -203,6 +234,23 @@ async function deleteStatistic(id) {
     if (!statistic) {
         throw createAnalyticsError("View statistic not found", 404);
     }
+
+    await Article.updateOne(
+        { _id: statistic.article },
+        [
+            {
+                $set: {
+                    totalViews: {
+                        $max: [
+                            0,
+                            { $subtract: ["$totalViews", statistic.viewCount] }
+                        ]
+                    }
+                }
+            }
+        ],
+        { updatePipeline: true }
+    );
 
     return statistic;
 }

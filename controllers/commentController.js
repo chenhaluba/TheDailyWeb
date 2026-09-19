@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 
 const Article = require("../models/Article");
 const Comment = require("../models/Comment");
-const CONSTANTS = require("../config/constants");
 
 const MAX_AUTHOR_NAME_LENGTH = 50;
 const MAX_CONTENT_LENGTH = 1000;
@@ -30,7 +29,7 @@ function toPublicComment(comment) {
 async function publishedArticleExists(articleId) {
     return await Article.exists({
         _id: articleId,
-        status: CONSTANTS.ARTICLE_STATUS.PUBLISHED
+        publishedVersion: { $ne: null }
     });
 }
 

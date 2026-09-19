@@ -5,36 +5,40 @@ const DEFAULT_LIMIT = 20;
 
 const SORT_OPTIONS = {
     [CONSTANTS.ARTICLE_SORT_OPTIONS.NEWEST]: {
-        createdAt: -1
+        "publishedVersion.savedAt": -1,
+        _id: -1
     },
     [CONSTANTS.ARTICLE_SORT_OPTIONS.POPULAR]: {
         totalViews: -1,
-        createdAt: -1
+        "publishedVersion.savedAt": -1,
+        _id: -1
     }
 };
 
 const PUBLIC_ARTICLE_FILTER = {
-    publishedVersion: {
-        $ne: null
-    }
+    publishedVersion: { $ne: null }
 };
 
-function escapeRegex(text = "") {
+function escapeRegex(text) {
     return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
-function buildArticleQuery({
-    search = "",
-    category = "",
-    sort = CONSTANTS.ARTICLE_SORT_OPTIONS.NEWEST
-} = {}) {
+function normalizeQueryValue(value) {
+    return typeof value === "string" ? value.trim() : "";
+}
 
-    const cleanSearch = search.trim();
+function buildArticleQuery(query = {}) {
+    const search = normalizeQueryValue(query.search);
+    const category = normalizeQueryValue(query.category);
+    const requestedSort = normalizeQueryValue(query.sort);
 
-    if (
-        category &&
-        !CONSTANTS.CATEGORIES.includes(category)
-    ) {
+    const sort = Object.values(
+        CONSTANTS.ARTICLE_SORT_OPTIONS
+    ).includes(requestedSort)
+        ? requestedSort
+        : CONSTANTS.ARTICLE_SORT_OPTIONS.NEWEST;
+
+    if (category && !CONSTANTS.CATEGORIES.includes(category)) {
         throw new Error("Invalid category");
     }
 
@@ -42,9 +46,9 @@ function buildArticleQuery({
         ...PUBLIC_ARTICLE_FILTER
     };
 
-    if (cleanSearch) {
+    if (search) {
         filter["publishedVersion.title"] = {
-            $regex: escapeRegex(cleanSearch),
+            $regex: escapeRegex(search),
             $options: "i"
         };
     }
@@ -54,18 +58,15 @@ function buildArticleQuery({
     }
 
     return {
-        search: cleanSearch,
+        search,
         category,
         sort,
         filter,
-        sortOption:
-            SORT_OPTIONS[sort] ??
-            SORT_OPTIONS[CONSTANTS.ARTICLE_SORT_OPTIONS.NEWEST]
+        sortOption: SORT_OPTIONS[sort]
     };
 }
 
-async function getPublishedArticles(filter = {}, options = {}) {
-
+async function getPublishedArticles(filter, options = {}) {
     const {
         limit = DEFAULT_LIMIT,
         skip = 0,
@@ -73,6 +74,7 @@ async function getPublishedArticles(filter = {}, options = {}) {
     } = options;
 
     return Article.find(filter)
+        .select("_id publishedVersion author totalViews")
         .populate("author", "displayName")
         .sort(sort)
         .skip(skip)
@@ -81,7 +83,6 @@ async function getPublishedArticles(filter = {}, options = {}) {
 }
 
 async function getHomePageData(query = {}) {
-
     const {
         search,
         category,
@@ -94,6 +95,13 @@ async function getHomePageData(query = {}) {
         limit: DEFAULT_LIMIT + 1,
         sort: sortOption
     });
+
+    // Fetch one extra article to check whether another page exists.
+    const hasMore = articles.length > DEFAULT_LIMIT;
+
+    if (hasMore) {
+        articles.pop();
+    }
 
     const showMainArticle = !search && !category;
 
@@ -111,24 +119,29 @@ async function getHomePageData(query = {}) {
         search,
         category,
         sort,
-        resultsCount: showMainArticle
-            ? feedArticles.length
-            : articles.length
+        hasMore,
+        resultsCount: feedArticles.length
     };
 }
 
 async function getFeed(query = {}) {
+    const requestedPage = Number.parseInt(
+        normalizeQueryValue(query.page),
+        10
+    );
 
-    const page = Math.max(
-        Number.parseInt(query.page, 10) || 1,
-        1
+    const page =
+        Number.isSafeInteger(requestedPage) && requestedPage > 0
+            ? requestedPage
+            : 1;
+
+    const requestedLimit = Number.parseInt(
+        normalizeQueryValue(query.limit),
+        10
     );
 
     const limit = Math.max(
-        Math.min(
-            Number.parseInt(query.limit, 10) || DEFAULT_LIMIT,
-            DEFAULT_LIMIT
-        ),
+        Math.min(requestedLimit || DEFAULT_LIMIT, DEFAULT_LIMIT),
         1
     );
 
@@ -162,11 +175,11 @@ async function getFeed(query = {}) {
 }
 
 async function getArticleById(id) {
-
     return Article.findOne({
         _id: id,
         ...PUBLIC_ARTICLE_FILTER
     })
+        .select("_id publishedVersion author totalViews")
         .populate("author", "displayName")
         .lean();
 }

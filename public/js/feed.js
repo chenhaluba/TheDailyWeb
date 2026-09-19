@@ -1,153 +1,237 @@
 const articlesGrid = document.querySelector(".articles-grid");
 const sentinel = document.querySelector("#feed-sentinel");
 const searchForm = document.querySelector("#search-form");
+const searchInput = document.querySelector("#search-input");
 const sortSelect = document.querySelector("#sort-filter");
-const sortForm = document.querySelector("#sort-form");
 const categoryInput = document.querySelector("#category-input");
 const categoryLinks = document.querySelectorAll(".main-nav a[data-category]");
+const articlesTitle = document.querySelector("#articles-title");
+const resultsCount = document.querySelector("#results-count");
+const mainArticleSection = document.querySelector("#main-article-section");
 
 let currentPage = 1;
 let isLoading = false;
-let hasMore = true;
+let reloadAfterLoading = false;
+let activeFilters = getFilters();
+let hasMore = sentinel?.dataset.hasMore !== "false";
+
+function escapeHtml(value = "") {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
 
 function getFilters() {
     const params = new URLSearchParams();
-    if (searchForm) {
-        const searchData = new FormData(searchForm);
-        for (const [key, value] of searchData) {
-            params.set(key, value);
-        }
+    const search = searchInput?.value.trim();
+    const category = categoryInput?.value.trim();
+    const sort = sortSelect?.value;
 
+    if (search) {
+        params.set("search", search);
     }
-
-    if (sortForm) {
-        const sortData = new FormData(sortForm);
-        for (const [key, value] of sortData) {
-            params.set(key, value);
-        }
-
+    if (category) {
+        params.set("category", category);
+    }
+    if (sort) {
+        params.set("sort", sort);
     }
 
     return params;
 }
 
-function buildApiUrl(page) {
-    const params = getFilters();
+function buildApiUrl(page, filters) {
+    const params = new URLSearchParams(filters);
     params.set("page", page);
     return `/api/articles?${params.toString()}`;
 }
 
-function clearArticles() {
-    articlesGrid.innerHTML = "";
+async function loadArticles(page, filters) {
+    try {
+        const response = await fetch(buildApiUrl(page, filters));
+        if (!response.ok) {
+            throw new Error("Failed to load articles");
+        }
+
+        const result = await response.json();
+        if (!result.data || !Array.isArray(result.data.items)) {
+            throw new Error("Invalid server response");
+        }
+
+        hasMore = result.data.pagination.hasMore;
+        return result.data.items;
+    } catch (error) {
+        console.error("Failed to load articles:", error);
+        return null;
+    }
 }
 
-function resetPagination() {
-    currentPage = 1;
-    hasMore = true;
+function createArticleCard(article) {
+    if (!article || !article._id || !article.publishedVersion) {
+        return null;
+    }
+
+    const publishedVersion = article.publishedVersion;
+    const authorName = article.author?.displayName || "Unknown Author";
+    const publicationDate = publishedVersion.savedAt
+        ? new Date(publishedVersion.savedAt).toLocaleDateString("en-US")
+        : "";
+
+    const articleCard = document.createElement("article");
+    articleCard.className = "article-card";
+    articleCard.innerHTML = `
+        <img
+            src="/images/${escapeHtml(publishedVersion.mainImage)}"
+            alt="${escapeHtml(publishedVersion.title)}">
+        <div class="article-card-content">
+            <span class="category">${escapeHtml(publishedVersion.category)}</span>
+            <h3>${escapeHtml(publishedVersion.title)}</h3>
+            <div class="article-card-meta">
+                <span>By ${escapeHtml(authorName)}</span>
+                <span>${escapeHtml(publicationDate)}</span>
+            </div>
+            <p>${escapeHtml(publishedVersion.summary)}</p>
+            <a href="/articles/${encodeURIComponent(article._id)}">Read More →</a>
+        </div>
+    `;
+
+    return articleCard;
+}
+
+function appendArticles(articles) {
+    for (const article of articles) {
+        const articleCard = createArticleCard(article);
+        if (articleCard) {
+            articlesGrid.appendChild(articleCard);
+        }
+    }
 }
 
 function renderEmptyState(title, message) {
     articlesGrid.innerHTML = `
         <div class="empty-state">
-            <h3>${title}</h3>
-            <p>${message}</p>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(message)}</p>
         </div>
     `;
-
-}
-
-function createArticleCard(article) {
-    const articleCard = document.createElement("article");
-    articleCard.className = "article-card";
-    articleCard.innerHTML = `
-        <img
-            src="/images/${article.publishedVersion.mainImage}"
-            alt="${article.publishedVersion.title}">
-
-        <div class="article-card-content">
-
-            <span class="category">
-                ${article.publishedVersion.category}
-            </span>
-
-            <h3>
-                ${article.publishedVersion.title}
-            </h3>
-
-            <p>
-                ${article.publishedVersion.summary}
-            </p>
-
-            <a href="/articles/${article._id}">
-                Read More →
-            </a>
-
-        </div>
-    `;
-    return articleCard;
-
-}
-
-function appendArticles(articles) {
-    articles.forEach(article => {
-        articlesGrid.appendChild(createArticleCard(article));
-    });
-
 }
 
 function renderArticles(articles) {
-    clearArticles();
+    articlesGrid.innerHTML = "";
+
     if (articles.length === 0) {
-        renderEmptyState(
-            "No results found",
-            "Try searching for something else."
-        );
+        const search = activeFilters.get("search") || "";
+
+        if (search) {
+            renderEmptyState(
+                "No results found",
+                `We couldn't find any articles matching "${search}".`
+            );
+        } else {
+            renderEmptyState(
+                "No articles available",
+                "There are currently no articles available."
+            );
+        }
         return;
     }
-    appendArticles(articles);
 
+    appendArticles(articles);
 }
 
-async function loadArticles(page) {
-    try {
-        const response = await fetch(buildApiUrl(page));
-        if (!response.ok) {
-            throw new Error("Failed to fetch articles");
-        }
-
-        const result = await response.json();
-        hasMore = result.data.pagination.hasMore;
-        return result.data.items;
-
-    } catch (error) {
-        console.error("Failed to fetch articles:", error);
-        return [];
+function updateHeader() {
+    if (!articlesTitle || !resultsCount) {
+        return;
     }
 
+    const displayedCount = articlesGrid.querySelectorAll(".article-card").length;
+    const search = activeFilters.get("search") || "";
+    const category = activeFilters.get("category") || "";
+
+    if (search) {
+        articlesTitle.textContent = "Search Results";
+        resultsCount.innerHTML = `
+            Showing <strong>${displayedCount}</strong>
+            article(s) matching "${escapeHtml(search)}"
+        `;
+        return;
+    }
+
+    if (category) {
+        articlesTitle.textContent = `${category} News`;
+        resultsCount.innerHTML = `
+            Showing <strong>${displayedCount}</strong> article(s)
+        `;
+        return;
+    }
+
+    articlesTitle.textContent = "Latest News";
+    resultsCount.innerHTML = "";
 }
 
-// Reload the first page after changing search, sort or category.
+function finishLoading() {
+    isLoading = false;
+
+    if (reloadAfterLoading) {
+        reloadAfterLoading = false;
+        reloadFeed();
+    }
+}
+
 async function reloadFeed() {
+    if (!articlesGrid) {
+        return;
+    }
     if (isLoading) {
+        reloadAfterLoading = true;
         return;
     }
 
     isLoading = true;
 
     try {
-        resetPagination();
-        const articles = await loadArticles(currentPage);
+        const filters = getFilters();
+        const articles = await loadArticles(1, filters);
+
+        if (reloadAfterLoading) {
+            return;
+        }
+        if (articles === null) {
+            hasMore = false;
+        
+            if (articlesTitle) {
+                articlesTitle.textContent = "Unable to load articles";
+            }
+            if (resultsCount) {
+                resultsCount.textContent = "";
+            }
+            if (sentinel) {
+                sentinel.textContent = "";
+            }
+        
+            renderEmptyState("Unable to load articles", "Please try again.");
+            return;
+        }
+
+        activeFilters = filters;
+        currentPage = 1;
+        sentinel.textContent = "";
         renderArticles(articles);
+        updateHeader();
 
-
+        if (mainArticleSection) {
+            mainArticleSection.hidden = true;
+        }
     } finally {
-        isLoading = false;
+        finishLoading();
     }
-
 }
 
-async function fetchArticles() {
-    if (isLoading || !hasMore) {
+async function loadNextPage() {
+    if (isLoading || !hasMore || !articlesGrid) {
         return;
     }
 
@@ -155,14 +239,23 @@ async function fetchArticles() {
 
     try {
         const nextPage = currentPage + 1;
-        const articles = await loadArticles(nextPage);
+        const articles = await loadArticles(nextPage, activeFilters);
+
+        if (reloadAfterLoading) {
+            return;
+        }
+        if (articles === null) {
+            sentinel.textContent = "Unable to load more articles.";
+            return;
+        }
+
+        sentinel.textContent = "";
         appendArticles(articles);
+        updateHeader();
         currentPage = nextPage;
-
     } finally {
-        isLoading = false;
+        finishLoading();
     }
-
 }
 
 function initSearch() {
@@ -170,22 +263,54 @@ function initSearch() {
         return;
     }
 
-    searchForm.addEventListener("submit", async event => {
+    searchForm.addEventListener("submit", event => {
         event.preventDefault();
-        await reloadFeed();
+        reloadFeed();
     });
-
 }
 
 function initSort() {
     if (!sortSelect) {
         return;
     }
-    sortSelect.addEventListener("change", async event => {
-        event.preventDefault();
-        await reloadFeed();
-    });
 
+    sortSelect.addEventListener("change", () => {
+        reloadFeed();
+    });
+}
+
+function updateActiveCategory(selectedLink) {
+    for (const link of categoryLinks) {
+        link.classList.toggle("active", link === selectedLink);
+    }
+}
+
+function initCategories() {
+    if (!categoryInput) {
+        return;
+    }
+
+    for (const link of categoryLinks) {
+        link.addEventListener("click", event => {
+            event.preventDefault();
+            const category = link.dataset.category || "";
+
+            if (!category) {
+                categoryInput.value = "";
+                if (searchInput) {
+                    searchInput.value = "";
+                }
+                if (sortSelect) {
+                    sortSelect.value = "newest";
+                }
+            } else {
+                categoryInput.value = category;
+            }
+
+            updateActiveCategory(link);
+            reloadFeed();
+        });
+    }
 }
 
 function initInfiniteScroll() {
@@ -196,54 +321,20 @@ function initInfiniteScroll() {
     const observer = new IntersectionObserver(
         entries => {
             const entry = entries[0];
-            if (!hasMore) {
-                return;
-            }
-
-            if (entry.isIntersecting && !isLoading) {
-                fetchArticles();
+            if (entry.isIntersecting && hasMore) {
+                loadNextPage();
             }
         },
-
-        {
-            rootMargin: "300px"
-        }
-
+        { rootMargin: "300px" }
     );
+
     observer.observe(sentinel);
 }
 
-function initCategory() {
-
-    if (!categoryInput || categoryLinks.length === 0) {
-        return;
-    }
-
-    categoryLinks.forEach(link => {
-        link.addEventListener("click", async event => {
-            event.preventDefault();
-            const category = link.dataset.category ?? "";
-            if (categoryInput.value === category) {
-                return;
-            }
-
-            categoryInput.value = category;
-            await reloadFeed();
-            categoryLinks.forEach(item =>
-                item.classList.remove("active")
-            );
-
-            link.classList.add("active");
-        });
-    });
-}
-
-
 function init() {
-
     initSearch();
     initSort();
-    initCategory();
+    initCategories();
     initInfiniteScroll();
 }
 

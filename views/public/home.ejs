@@ -3,7 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
     <title><%= pageTitle %></title>
 
     <link rel="stylesheet" href="/css/common.css">
@@ -16,14 +20,14 @@
 
     <main class="container">
 
+        <!-- Weather -->
+        <section id="weather-section">
+            <%- include("../partials/weatherWidget") %>
+        </section>
+
+        <!-- Main Article -->
         <% if (mainArticle) { %>
 
-            <!-- Weather Widget -->
-            <section id="weather-section">
-                <%- include("../partials/weatherWidget") %>
-            </section>
-
-            <!-- Main Article -->
             <section id="main-article-section">
 
                 <h2 class="section-title">
@@ -36,32 +40,40 @@
 
         <% } %>
 
-        <!-- filters -->
+        <!-- Search -->
         <section id="filters-section">
 
-            <form id="search-form" method="GET" action="/">
+            <form
+                id="search-form"
+                method="GET"
+                action="/">
 
                 <input
-                    type="text"
                     id="search-input"
+                    type="text"
                     name="search"
                     value="<%= search || '' %>"
                     placeholder="Search by title...">
-            
+
                 <input
                     id="category-input"
                     type="hidden"
                     name="category"
-                    value="<%= category || "" %>">
-            
+                    value="<%= category || '' %>">
+
+                <input
+                    type="hidden"
+                    name="sort"
+                    value="<%= sort || 'newest' %>">
+
                 <button
                     id="search-button"
                     type="submit">
-            
+
                     🔍 Search
-            
+
                 </button>
-            
+
             </form>
 
         </section>
@@ -73,40 +85,54 @@
 
                 <div>
 
-                    <% if (search) { %>
+                    <h2
+                        id="articles-title"
+                        class="section-title">
 
-                        <h2 class="section-title">
+                        <% if (search) { %>
+
                             Search Results
-                        </h2>
-                    
-                        <p class="results-count">
-                            Found
-                            <strong><%= resultsCount %></strong>
-                            article(s) matching
-                            "<strong><%= search %></strong>"
-                        </p>
-                    
-                    <% } else if (category) { %>
-                    
-                        <h2 class="section-title">
+
+                        <% } else if (category) { %>
+
                             <%= category %> News
-                        </h2>
-                    
-                        <p class="results-count">
-                            Showing
-                            <strong><%= resultsCount %></strong>
-                            article(s)
-                        </p>
-                    
-                    <% } else { %>
-                    
-                        <h2 class="section-title">
+
+                        <% } else { %>
+
                             Latest News
-                        </h2>
-                    
-                    <% } %>
+
+                        <% } %>
+
+                    </h2>
+
+                    <p
+                        id="results-count"
+                        class="results-count">
+
+                        <% if (search) { %>
+
+                            Found
+                            <strong>
+                                <%= resultsCount %>
+                            </strong>
+                            article(s) matching
+                            "<%= search %>"
+
+                        <% } else if (category) { %>
+
+                            Showing
+                            <strong>
+                                <%= resultsCount %>
+                            </strong>
+                            article(s)
+
+                        <% } %>
+
+                    </p>
+
                 </div>
 
+                <!-- Sort -->
                 <form
                     id="sort-form"
                     method="GET"
@@ -127,7 +153,7 @@
                             type="hidden"
                             name="category"
                             value="<%= category %>">
-                    
+
                     <% } %>
 
                     <label for="sort-filter">
@@ -135,34 +161,46 @@
                     </label>
 
                     <select
-                    id="sort-filter"
-                    name="sort">
-                
-                    <option
-                        value="newest"
-                        <%= sort === "newest" ? "selected" : "" %>>
-                        Newest
-                    </option>
-                
-                    <option
-                        value="popular"
-                        <%= sort === "popular" ? "selected" : "" %>>
-                        Most Viewed
-                    </option>
-                
-                </select>
+                        id="sort-filter"
+                        name="sort">
+
+                        <option
+                            value="newest"
+                            <%= sort === "newest"
+                                ? "selected"
+                                : "" %>>
+
+                            Newest
+
+                        </option>
+
+                        <option
+                            value="popular"
+                            <%= sort === "popular"
+                                ? "selected"
+                                : "" %>>
+
+                            Most Viewed
+
+                        </option>
+
+                    </select>
 
                 </form>
 
             </div>
 
+            <!-- Feed -->
             <div class="articles-grid">
 
                 <% if (articles && articles.length > 0) { %>
 
                     <% articles.forEach(article => { %>
 
-                        <%- include("../partials/articleCard", { article }) %>
+                        <%- include(
+                            "../partials/articleCard",
+                            { article }
+                        ) %>
 
                     <% }) %>
 
@@ -176,7 +214,7 @@
 
                             <p>
                                 We couldn't find any articles matching
-                                "<strong><%= search %></strong>".
+                                "<%= search %>".
                             </p>
 
                         <% } else { %>
@@ -184,7 +222,7 @@
                             <h3>No articles available</h3>
 
                             <p>
-                                There are currently no published articles.
+                                There are currently no articles available.
                             </p>
 
                         <% } %>
@@ -195,14 +233,23 @@
 
             </div>
 
-            <div id="feed-sentinel"></div>
+            <!-- Infinite Scroll -->
+            <div
+                id="feed-sentinel"
+                data-has-more="<%= hasMore %>">
+            </div>
 
         </section>
 
     </main>
 
     <%- include("../partials/footer") %>
-    <script src="/js/feed.js" defer></script>
+
+    <script
+        src="/js/feed.js"
+        defer>
+    </script>
+
 </body>
 
 </html>

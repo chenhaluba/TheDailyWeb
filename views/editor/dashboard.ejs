@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><%= pageTitle %> | The Daily Web</title>
+
+    <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/reporterDashboard.css">
+    <link rel="stylesheet" href="/css/editorDashboard.css?v=2">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="header-content">
+
+            <a href="/" class="site-logo">
+                The Daily Web
+            </a>
+
+            <nav class="header-navigation">
+                <a href="/editor/dashboard" class="active">
+                    Articles
+                </a>
+
+                <a href="/user/profile">
+                    My Profile
+                </a>
+
+                <a href="/logout" class="logout-link">
+                    Logout
+                </a>
+            </nav>
+
+        </div>
+    </header>
+
+    <main class="dashboard-container">
+
+        <section class="dashboard-heading">
+
+            <div>
+                <p class="dashboard-label">
+                    Editor Portal
+                </p>
+
+                <h1>Article Management</h1>
+
+                <p class="dashboard-description">
+                    Review and manage articles submitted by reporters.
+                </p>
+            </div>
+
+        </section>
+
+        <% if (errorMessage) { %>
+            <div class="message message-error">
+                <%= errorMessage %>
+            </div>
+        <% } %>
+
+        <section class="stats-row">
+
+            <div class="stat-card stat-card--draft">
+                <span class="stat-value">
+                    <%= statusCounts.draft %>
+                </span>
+                <span class="stat-label">
+                    Draft
+                </span>
+            </div>
+
+            <div class="stat-card stat-card--pending">
+                <span class="stat-value">
+                    <%= statusCounts.pending %>
+                </span>
+                <span class="stat-label">
+                    Pending Review
+                </span>
+            </div>
+
+            <div class="stat-card stat-card--published">
+                <span class="stat-value">
+                    <%= statusCounts.published %>
+                </span>
+                <span class="stat-label">
+                    Published
+                </span>
+            </div>
+
+            <div class="stat-card stat-card--returned">
+                <span class="stat-value">
+                    <%= statusCounts.returned %>
+                </span>
+                <span class="stat-label">
+                    Returned
+                </span>
+            </div>
+
+        </section>
+
+        <section class="editor-filters">
+
+            <button class="filter-button active" data-status="">
+                All
+            </button>
+
+            <button class="filter-button" data-status="pending">
+                Pending
+            </button>
+
+            <button class="filter-button" data-status="published">
+                Published
+            </button>
+
+            <button class="filter-button" data-status="returned">
+                Returned
+            </button>
+
+            <button class="filter-button" data-status="draft">
+                Draft
+            </button>
+
+        </section>
+
+        <section class="articles-section">
+
+            <div class="section-heading">
+
+                <h2>All Articles</h2>
+
+                <span class="articles-count">
+                    <span id="visible-count"><%= articles.length %></span>
+                    articles
+                </span>
+
+            </div>
+
+            <div id="editor-articles" class="articles-grid">
+
+                <% articles.forEach(article => { %>
+
+                    <article
+                        class="article-card article-card--<%= article.status %>"
+                        data-status="<%= article.status %>"
+                    >
+
+                        <div class="article-card-header">
+
+                            <span class="status-badge status-<%= article.status %>">
+                                <%= article.status %>
+                            </span>
+
+                            <span class="saved-date">
+                                <%= new Date(article.updatedAt).toLocaleString() %>
+                            </span>
+
+                        </div>
+
+                        <h3 class="article-title">
+                            <%= article.workingVersion?.title || article.publishedVersion?.title || "Untitled article" %>
+                        </h3>
+
+                        <p class="article-reporter">
+                            Reporter:
+                            <strong>
+                                <%= article.author?.displayName || article.author?.username || "Unknown" %>
+                            </strong>
+                        </p>
+
+                        <div class="article-card-actions">
+
+                            <a
+                                class="primary-button"
+                                href="/editor/articles/<%= article._id %>/review"
+                            >
+                                Review Article
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                <% }); %>
+
+            </div>
+
+            <% if (!articles.length && !errorMessage) { %>
+
+                <div class="empty-state">
+                    <h3>No articles found</h3>
+                    <p>There are currently no articles to review.</p>
+                </div>
+
+            <% } %>
+
+        </section>
+
+    </main>
+
+    <script src="/js/editorDashboard.js"></script>
+
+</body>
+</html>

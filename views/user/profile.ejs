@@ -95,7 +95,7 @@
             <div class="profile-container">
                 <div class="profile-header">
                     <h2>My Profile</h2>
-                    <a href="/reporter/dashboard" id="dashboard-btn" class="primary-button">My Dashboard</a>
+                    <a href="/<%= user.role %>/dashboard" id="dashboard-btn" class="primary-button">My Dashboard</a>
                 </div>
 
                 <form id="profile-form">
@@ -175,8 +175,31 @@
                     }
                 });
 
-                document.getElementById('delete-account-btn').addEventListener('click', () => {
-                    console.log("Delete logic will run here");
+                document.getElementById('delete-account-btn').addEventListener('click', async () => {
+                    const isConfirmed = confirm("Are you sure you want to PERMANENTLY delete your account? This action cannot be undone.");
+                    if (!isConfirmed) return;
+                    const password = prompt("Please enter your password to confirm account deletion:");
+                    if (!password) return;
+                    const username = document.getElementById('username').value;
+                    try {
+                        const response = await fetch('/user', {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ username, password })
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            alert('Your account has been deleted.');
+                            window.location.href = data.redirect || '/login';
+                        } else {
+                            alert(data.message || 'Failed to delete account.');
+                        }
+                    } catch (err) {
+                        console.error('Error deleting account:', err);
+                        alert('An error occurred while deleting your account.');
+                    }
                 });
             </script>
 </body>

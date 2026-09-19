@@ -25,5 +25,5 @@ router.post('/', validateSession, validateRole('editor'), createUser);
 
 router.put('/', validateSession, updateUser);
 
-router.delete('/', validateSession, validateRole('editor'), deleteUser);
+router.delete('/', validateSession, deleteUser);
 module.exports = router;

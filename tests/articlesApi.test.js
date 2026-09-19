@@ -170,7 +170,7 @@ describe("Articles API", () => {
             expect(response.status).toBe(200);
 
             const dates = response.body.data.items.map(
-                article => new Date(article.createdAt)
+                article => new Date(article.publishedVersion.savedAt)
             );
 
             for (let i = 1; i < dates.length; i++) {

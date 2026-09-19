@@ -54,4 +54,11 @@ router.delete(
     editorArticleController.deleteArticle
 );
 
+router.get(
+    "/editor/dashboard",
+    validateSession,
+    validateRole("editor"),
+    editorArticleController.renderDashboard
+);
+
 module.exports = router;

@@ -168,3 +168,45 @@ exports.deleteArticle = async (req, res) => {
         );
     }
 };
+
+exports.renderDashboard = async (req, res) => {
+    try {
+        const articles =
+            await articleWorkflowService.getEditorArticles();
+
+        const statusCounts = {
+            draft: 0,
+            pending: 0,
+            published: 0,
+            returned: 0
+        };
+
+        for (const article of articles) {
+            if (statusCounts[article.status] !== undefined) {
+                statusCounts[article.status]++;
+            }
+        }
+
+        return res.render("editor/dashboard", {
+            pageTitle: "Editor Dashboard",
+            articles,
+            statusCounts,
+            errorMessage: ""
+        });
+
+    } catch (error) {
+        console.error("Failed to load editor dashboard:", error);
+
+        return res.status(500).render("editor/dashboard", {
+            pageTitle: "Editor Dashboard",
+            articles: [],
+            statusCounts: {
+                draft: 0,
+                pending: 0,
+                published: 0,
+                returned: 0
+            },
+            errorMessage: "Failed to load articles. Please try again later."
+        });
+    }
+};

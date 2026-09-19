@@ -136,7 +136,6 @@ async function reloadFeed() {
 
     try {
         resetPagination();
-        currentPage = 1;
         const articles = await loadArticles(currentPage);
         renderArticles(articles);
 

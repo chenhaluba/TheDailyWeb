@@ -13,6 +13,12 @@ const SORT_OPTIONS = {
     }
 };
 
+const PUBLIC_ARTICLE_FILTER = {
+    publishedVersion: {
+        $ne: null
+    }
+};
+
 function escapeRegex(text = "") {
     return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -33,7 +39,7 @@ function buildArticleQuery({
     }
 
     const filter = {
-        status: CONSTANTS.ARTICLE_STATUS.PUBLISHED
+        ...PUBLIC_ARTICLE_FILTER
     };
 
     if (cleanSearch) {
@@ -159,7 +165,7 @@ async function getArticleById(id) {
 
     return Article.findOne({
         _id: id,
-        status: CONSTANTS.ARTICLE_STATUS.PUBLISHED
+        ...PUBLIC_ARTICLE_FILTER
     })
         .populate("author", "displayName")
         .lean();

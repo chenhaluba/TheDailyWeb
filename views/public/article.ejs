@@ -18,7 +18,9 @@
 
     <main class="article-container">
 
-        <article class="article-page">
+        <article
+            class="article-page"
+            data-article-id="<%= article._id %>">
 
             <span class="article-category">
                 <%= article.publishedVersion.category %>
@@ -130,6 +132,7 @@
 
     <%- include("../partials/footer") %>
 
+    <script src="/js/articleViews.js" defer></script>
     <script src="/js/comments.js" defer></script>
 
 </body>

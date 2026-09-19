@@ -217,6 +217,12 @@ async function reloadFeed() {
         }
 
         activeFilters = filters;
+        const queryString = filters.toString();
+        window.history.replaceState(
+            null,
+            "",
+            queryString ? `/?${queryString}` : "/"
+        );
         currentPage = 1;
         sentinel.textContent = "";
         renderArticles(articles);

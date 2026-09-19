@@ -31,15 +31,14 @@
             <div class="article-meta">
 
                 <span>
-                    By <strong><%= article.author.displayName %></strong>
-                </span>
+                    By <strong><%= article.author?.displayName || "Unknown Author" %></strong>                </span>
 
                 <span>
                     •
                 </span>
 
                 <span>
-                    <%= new Date(article.publishedVersion.savedAt).toLocaleDateString() %>
+                    <%= new Date(article.publishedVersion.savedAt).toLocaleDateString("en-US") %>
                 </span>
 
             </div>

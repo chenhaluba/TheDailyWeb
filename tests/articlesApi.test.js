@@ -170,7 +170,7 @@ describe("Articles API", () => {
             expect(response.status).toBe(200);
 
             const dates = response.body.data.items.map(
-                article => new Date(article.createdAt)
+                article => new Date(article.publishedVersion.savedAt)
             );
 
             for (let i = 1; i < dates.length; i++) {
@@ -300,6 +300,62 @@ describe("Articles API", () => {
 
         });
 
+    });
+
+    describe("Published Version Visibility", () => {
+
+        test("should return only articles that have a published version", async () => {
+    
+            const response = await request(BASE_URL)
+                .get("/api/articles");
+    
+            expect(response.status).toBe(200);
+    
+            response.body.data.items.forEach(article => {
+                expect(article.publishedVersion).not.toBeNull();
+            });
+    
+        });
+    
+        test("should return published version data for every article", async () => {
+    
+            const response = await request(BASE_URL)
+                .get("/api/articles");
+    
+            expect(response.status).toBe(200);
+    
+            response.body.data.items.forEach(article => {
+    
+                expect(article.publishedVersion).toBeDefined();
+    
+                expect(article.publishedVersion.title)
+                    .toBeDefined();
+    
+                expect(article.publishedVersion.content)
+                    .toBeDefined();
+    
+                expect(article.publishedVersion.summary)
+                    .toBeDefined();
+    
+            });
+    
+        });
+    
+        test("should not expose articles without a published version", async () => {
+    
+            const response = await request(BASE_URL)
+                .get("/api/articles");
+    
+            expect(response.status).toBe(200);
+    
+            const draftOnlyArticles = response.body.data.items.filter(
+                article => article.publishedVersion === null
+            );
+    
+            expect(draftOnlyArticles).toHaveLength(0);
+    
+        });
+    
     });
 
 });

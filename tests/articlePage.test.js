@@ -1,4 +1,5 @@
 const request = require("supertest");
+const mongoose = require("mongoose");
 
 const BASE_URL = "http://localhost:3000";
 
@@ -34,12 +35,12 @@ describe("Article Page", () => {
     });
 
     test("should return 404 for non existing ObjectId", async () => {
-
+        const id = new mongoose.Types.ObjectId().toString();
+    
         const response = await request(BASE_URL)
-            .get("/articles/507f1f77bcf86cd799439011");
-
-        expect([404, 200]).toContain(response.status);
-
+            .get(`/articles/${id}`);
+    
+        expect(response.status).toBe(404);
     });
 
 });

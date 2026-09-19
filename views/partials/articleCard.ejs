@@ -13,7 +13,14 @@
         <h3>
             <%= article.publishedVersion.title %>
         </h3>
-
+        
+        <div class="article-card-meta">
+            <span>By <%= article.author?.displayName || "Unknown Author" %></span>
+            <span><%= article.publishedVersion.savedAt
+                ? new Date(article.publishedVersion.savedAt).toLocaleDateString("en-US")
+                : "" %></span>
+        </div>
+        
         <p>
             <%= article.publishedVersion.summary %>
         </p>

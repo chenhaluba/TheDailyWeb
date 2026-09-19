@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
+const editorArticleRoutes = require("./routes/editorArticleRoutes");
 const connectDatabase = require("./config/database");
 const authRoutes = require("./routes/authRoutes");
 const pageRoutes = require("./routes/pageRoutes");
@@ -31,6 +32,7 @@ app.use("/api/reporter/articles", reporterArticleRoutes);
 app.use("/", pageRoutes);
 app.use("/", commentRoutes);
 app.use("/api/articles", articleRoutes);
+app.use("/", editorArticleRoutes);
 app.use("/user", userRoutes);
 
 app.use((req, res) => {

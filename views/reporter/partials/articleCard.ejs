@@ -1,0 +1,21 @@
+<article class="article-card article-card--<%= article.statusClass %>">
+    <div class="article-card-header">
+        <span class="status-badge status-<%= article.statusClass %>"><%= article.statusLabel %></span>
+        <span class="saved-date">Saved <%= article.savedAt %></span>
+    </div>
+    <h3 class="article-title"><%= article.title %></h3>
+
+    <% if (article.editorNote) { %>
+        <%- include("editorNote", { note: article.editorNote, pageNote: false }) %>
+    <% } %>
+
+    <div class="article-card-actions">
+        <% if (article.canEdit) { %>
+            <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">Edit</a>
+        <% } else if (article.canStartUpdate) { %>
+            <button type="button" class="secondary-button start-update-button" data-article-id="<%= article.id %>">Start Update</button>
+        <% } else { %>
+            <a href="/reporter/articles/<%= article.id %>/edit" class="secondary-button">View</a>
+        <% } %>
+    </div>
+</article>

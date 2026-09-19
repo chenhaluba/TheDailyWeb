@@ -61,4 +61,11 @@ router.get(
     editorArticleController.renderDashboard
 );
 
+router.get(
+    "/editor/articles/:id/review",
+    validateSession,
+    validateRole("editor"),
+    editorArticleController.renderReviewArticle
+);
+
 module.exports = router;

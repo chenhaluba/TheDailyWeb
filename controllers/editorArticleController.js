@@ -210,3 +210,30 @@ exports.renderDashboard = async (req, res) => {
         });
     }
 };
+
+exports.renderReviewArticle = async (req, res) => {
+    try {
+        const article = await articleWorkflowService.getEditorArticleById(req.params.id);
+
+        if (!article) {
+            return res.status(404).render("notFound", {
+                pageTitle: "Article Not Found"
+            });
+        }
+
+        return res.render("editor/reviewArticle", {
+            pageTitle: "Review Article",
+            article
+        });
+    } catch (error) {
+        console.error("Failed to render editor review page:", error);
+
+        if (error.name === "CastError") {
+            return res.status(404).render("notFound", {
+                pageTitle: "Article Not Found"
+            });
+        }
+
+        return res.status(500).send("Failed to load article");
+    }
+};

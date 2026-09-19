@@ -51,9 +51,10 @@ async function deleteUser(req, res) {
 
         if (isValidUsername && isValidPassword) {
             await User.deleteOne({ username: username });
-            return res.redirect('/login');
+            res.clearCookie('token');
+            return res.status(200).json({ message: "Account deleted successfully", redirect: "/login" });
         } else {
-            return res.status(400).json({ message: "Invalid input data" });
+            return res.status(400).json({ message: "Invalid username or password" });
         }
     } catch (error) {
         console.error("Error deleting user:", error);

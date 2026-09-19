@@ -58,6 +58,16 @@
             border: none;
             cursor: pointer;
         }
+        .error-message {
+            background-color: #fde8e8;
+            color: #dc3545;
+            border: 1px solid #f8b4b4;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -66,6 +76,9 @@
     <main class="login-container">
         <div class="login-card">
             <h2>Welcome Back</h2>
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="error-message"><%= error %></div>
+            <% } %>
             <form action="/login" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>

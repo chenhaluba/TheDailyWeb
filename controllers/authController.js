@@ -13,7 +13,7 @@ async function login(req, res) {
 
     const user = await User.findOne({ username: username }).select('+passwordHash');
     if (!user) {
-      return res.status(401).render('notFound', { pageTitle: 'Login Failed' });
+      return res.status(401).render('auth/login', { error: 'Incorrect username or password' });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.passwordHash);
@@ -36,12 +36,11 @@ async function login(req, res) {
       return res.redirect('/user/profile');
     }
     else {
-      return res.status(401).render('notFound', { pageTitle: 'Login Failed' });
+      return res.status(401).render('auth/login', { error: 'Incorrect username or password' });
     }
   } catch (error) {
     console.error('Error In Login', error);
-    return res.status(500).render('notFound', { pageTitle: 'Error' });
-
+    return res.status(500).render('auth/login', { error: 'An error occurred during login. Please try again.' });
   }
 }
 

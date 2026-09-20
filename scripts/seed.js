@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const connectDatabase = require("../config/database");
 const User = require("../models/User");
 const Article = require("../models/Article");
+const Comment = require("../models/Comment");
+const ViewStatistic = require("../models/ViewStatistic");
 
 const names = ["yuval", "noy", "chen", "shirK", "shirA"];
 const categories = ["News", "Economy", "Politics", "Sports", "Culture", "Technology", "Science"];
@@ -16,6 +18,8 @@ async function seedDatabase() {
         await connectDatabase();
         console.log("Connected to Db. Starting seed process...");
 
+        await Comment.deleteMany({});
+        await ViewStatistic.deleteMany({});
         await Article.deleteMany({});
         await User.deleteMany({});
         console.log("Cleared old data...");
@@ -50,6 +54,7 @@ async function seedDatabase() {
         console.log(`Created ${editors.length} editors and ${reporters.length} reporters.`);
 
         // 2. Generate 50 distinct articles
+        const seedExecutionTime = new Date();
         const articlesToInsert = [];
         for (let i = 1; i <= 50; i++) {
             const category = sample(categories);
@@ -59,6 +64,12 @@ async function seedDatabase() {
             const statusOptions = ["draft", "pending", "published", "returned"];
             // Force the first 35 to be 'published' so the public feed has plenty of data to show
             const status = i <= 35 ? "published" : sample(statusOptions);
+            let publishedAt = null;
+
+            if (status === "published") {
+                publishedAt = new Date(seedExecutionTime);
+                publishedAt.setUTCDate(publishedAt.getUTCDate() - (8 + ((i - 1) % 7)));
+            }
 
             // Generate unique content
             const title = `Breaking News in ${category}: Report #${i}`;
@@ -80,7 +91,7 @@ async function seedDatabase() {
                 content,
                 category,
                 mainImage,
-                savedAt: new Date()
+                savedAt: publishedAt || new Date()
             };
 
             const articleData = {
@@ -91,9 +102,13 @@ async function seedDatabase() {
 
             // If it's published, copy it to publishedVersion and add history
             if (status === "published") {
+                const createdAt = new Date(publishedAt);
+                createdAt.setUTCDate(createdAt.getUTCDate() - 1);
+                articleData.createdAt = createdAt;
+                articleData.updatedAt = publishedAt;
                 articleData.publishedVersion = articleVersion;
                 articleData.publicationHistory = [{
-                    publishedAt: new Date(),
+                    publishedAt,
                     approvedBy: editor._id,
                     versionNumber: 1
                 }];
@@ -105,8 +120,84 @@ async function seedDatabase() {
         }
 
         // Insert all 50 articles in bulk
-        await Article.insertMany(articlesToInsert);
+        const insertedArticles = await Article.insertMany(articlesToInsert);
         console.log(`Successfully seeded ${articlesToInsert.length} distinct articles with Picsum images!`);
+
+        const publishedArticles = insertedArticles
+            .map((article, index) => ({ article, index }))
+            .filter(({ article }) => article.publishedVersion !== null);
+        const viewHours = [8, 12, 16, 20];
+        const viewStatistics = [];
+        const articleViewTotals = new Map();
+
+        for (const { article, index } of publishedArticles) {
+            let totalViews = 0;
+
+            for (let dayOffset = 7; dayOffset >= 1; dayOffset--) {
+                for (let hourIndex = 0; hourIndex < viewHours.length; hourIndex++) {
+                    const bucketStart = new Date(Date.UTC(
+                        seedExecutionTime.getUTCFullYear(),
+                        seedExecutionTime.getUTCMonth(),
+                        seedExecutionTime.getUTCDate() - dayOffset,
+                        viewHours[hourIndex],
+                        0,
+                        0,
+                        0
+                    ));
+                    const viewCount = 10 + (((index + 1) * 7 + dayOffset * 5 + hourIndex * 3) % 61);
+
+                    viewStatistics.push({
+                        article: article._id,
+                        bucketStart,
+                        viewCount
+                    });
+                    totalViews += viewCount;
+                }
+            }
+
+            articleViewTotals.set(article._id.toString(), totalViews);
+        }
+
+        await ViewStatistic.insertMany(viewStatistics);
+
+        const totalViewUpdates = publishedArticles.map(({ article }) => ({
+            updateOne: {
+                filter: { _id: article._id },
+                update: { $set: { totalViews: articleViewTotals.get(article._id.toString()) } }
+            }
+        }));
+        await Article.bulkWrite(totalViewUpdates);
+
+        const commentAuthors = ["Dana", "Ariel", "Noam", "Maya"];
+        const commentContents = [
+            "A clear overview of the topic. Thanks for the update.",
+            "The background details made this easy to follow."
+        ];
+        const comments = [];
+
+        for (const { article, index } of publishedArticles.slice(0, 6)) {
+            const publishedAt = article.publicationHistory[0].publishedAt;
+
+            for (let commentIndex = 0; commentIndex < 2; commentIndex++) {
+                const createdAt = new Date(publishedAt);
+                createdAt.setDate(createdAt.getDate() + 2 + (commentIndex * 2));
+
+                comments.push({
+                    article: article._id,
+                    authorName: commentAuthors[(index + commentIndex) % commentAuthors.length],
+                    content: commentContents[commentIndex],
+                    deviceId: `seed-device-${index + 1}-${commentIndex + 1}`,
+                    isVisible: comments.length % 5 !== 4,
+                    createdAt,
+                    updatedAt: createdAt
+                });
+            }
+        }
+
+        await Comment.insertMany(comments);
+        console.log(`Created ${comments.length} comments.`);
+        console.log(`Created ${viewStatistics.length} ViewStatistic records.`);
+        console.log(`Updated totalViews for ${totalViewUpdates.length} articles.`);
 
         console.log("Seeding process finished completely.");
         process.exit(0);

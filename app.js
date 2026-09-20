@@ -12,6 +12,7 @@ const reporterArticleRoutes = require("./routes/reporterArticleRoutes");
 const commentRoutes = require("./routes/commentRoutes");
 const articleRoutes = require("./routes/articleRoutes");
 const userRoutes = require("./routes/userRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +35,7 @@ app.use("/", commentRoutes);
 app.use("/api/articles", articleRoutes);
 app.use("/", editorArticleRoutes);
 app.use("/user", userRoutes);
+app.use("/", analyticsRoutes);
 
 app.use((req, res) => {
     res.status(404).render("notFound", { pageTitle: "Page Not Found" });

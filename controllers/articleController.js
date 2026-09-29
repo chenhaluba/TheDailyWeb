@@ -1,13 +1,19 @@
 const mongoose = require("mongoose");
 const CONSTANTS = require("../config/constants");
 const articleService = require("../services/articleService");
+const weatherController = require("./weatherController");
 
 exports.getHomePage = async (req, res) => {
     try {
 
-        const data = await articleService.getHomePageData(req.query);
+        const [data, weather] = await Promise.all([
+            articleService.getHomePageData(req.query),
+            getWeatherData()
+        ]);
+
         return res.render("public/home", {
             pageTitle: "The Daily Web",
+            weather,
             ...data
         });
 

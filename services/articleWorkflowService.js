@@ -95,12 +95,29 @@ async function returnArticle(id, editorNote) {
         throw createWorkflowError("Article not found", 404);
     }
 
-    if (article.status !== CONSTANTS.ARTICLE_STATUS.PENDING) {
-        throw createWorkflowError("Article is not pending", 400);
+    const canReturn =
+        article.status === CONSTANTS.ARTICLE_STATUS.PENDING ||
+        article.status === CONSTANTS.ARTICLE_STATUS.PUBLISHED;
+
+    if (!canReturn) {
+        throw createWorkflowError(
+            "Only pending or published articles can be returned",
+            400
+        );
     }
 
     if (typeof editorNote !== "string" || !editorNote.trim()) {
         throw createWorkflowError("Editor note is required", 400);
+    }
+
+    if (
+        article.status === CONSTANTS.ARTICLE_STATUS.PUBLISHED &&
+        article.publishedVersion
+    ) {
+        article.workingVersion = {
+            ...article.publishedVersion.toObject(),
+            savedAt: new Date()
+        };
     }
 
     article.status = CONSTANTS.ARTICLE_STATUS.RETURNED;
@@ -110,7 +127,6 @@ async function returnArticle(id, editorNote) {
 
     return article;
 }
-
 async function deleteArticle(id) {
     const article = await Article.findByIdAndDelete(id);
 

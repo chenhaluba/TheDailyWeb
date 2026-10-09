@@ -116,14 +116,21 @@
 
     <section class="editor-actions">
 
-        <div class="return-section">
-            <label for="editor-note">Editor Note</label>
+           <div class="return-section">
+             <label for="editor-note">Editor Note</label>
 
-            <textarea
-                id="editor-note"
-                maxlength="1000"
-                placeholder="Explain what the reporter should change..."
-            ><%= article.editorNote || "" %></textarea>
+             <textarea
+        id="editor-note"
+        maxlength="1000"
+        placeholder="Explain what the reporter should change..."
+       ><%= article.editorNote || "" %></textarea>
+
+         <p
+        id="editor-note-error"
+        class="editor-note-error"
+        role="alert"
+        hidden
+        ></p>
         </div>
 
         <div class="action-buttons">
@@ -141,7 +148,7 @@
                 type="button"
                 id="return-button"
                 class="secondary-button"
-                <%= article.status !== "pending" ? "disabled" : "" %>
+                <%= (article.status !== "pending" && article.status !== "published") ? "disabled" : "" %>
             >
                 Return to Reporter
             </button>

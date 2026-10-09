@@ -8,6 +8,7 @@ if (reviewPage) {
     const returnButton = document.getElementById("return-button");
     const deleteButton = document.getElementById("delete-button");
     const editorNote = document.getElementById("editor-note");
+    const editorNoteError = document.getElementById("editor-note-error");
     const messageBox = document.getElementById("message-box");
 
     function showMessage(message, type = "success") {
@@ -69,16 +70,26 @@ if (reviewPage) {
         }
     });
 
+    editorNote.addEventListener("input", () => {
+    if (editorNote.value.trim()) {
+        editorNoteError.hidden = true;
+        editorNoteError.textContent = "";
+    }
+    });
+
     returnButton?.addEventListener("click", async () => {
         const note = editorNote.value.trim();
 
-        if (!note) {
-            showMessage(
-                "Please write an editor note before returning the article.",
-                "error"
-            );
-            return;
+       if (!note) {
+         editorNoteError.textContent =
+        "Please write an editor note before returning the article.";
+        editorNoteError.hidden = false;
+          editorNote.focus();
+         return;
         }
+
+editorNoteError.hidden = true;
+editorNoteError.textContent = "";
 
         try {
             const response = await fetch(

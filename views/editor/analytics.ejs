@@ -47,25 +47,47 @@
             </div>
         </section>
 
-        <section class="analytics-filter-section" aria-labelledby="analytics-filters-heading">
+        <section class="analytics-filter-section" aria-labelledby="analytics-filters-heading" lang="en-GB" dir="ltr">
             <h2 id="analytics-filters-heading">Analytics filters</h2>
 
             <form id="analytics-filters">
-                <div class="form-group">
+                <div class="form-group article-filter">
                     <label for="article-select">Article</label>
                     <select id="article-select" name="articleId">
                         <option value="">Select an article</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="analytics-from">From</label>
-                    <input type="datetime-local" id="analytics-from" name="from">
+                <div class="form-group analytics-range-filter">
+                    <span class="analytics-range-label">From</span>
+                    <div class="date-hour-fields">
+                        <div class="date-hour-field">
+                            <label for="analytics-from-date">Date</label>
+                            <input type="date" id="analytics-from-date" name="fromDate" lang="en-GB" dir="ltr">
+                        </div>
+                        <div class="date-hour-field hour-field">
+                            <label for="analytics-from-hour">Hour (optional)</label>
+                            <select id="analytics-from-hour" name="fromHour">
+                                <option value="">Any hour</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="analytics-to">To</label>
-                    <input type="datetime-local" id="analytics-to" name="to">
+                <div class="form-group analytics-range-filter">
+                    <span class="analytics-range-label">To</span>
+                    <div class="date-hour-fields">
+                        <div class="date-hour-field">
+                            <label for="analytics-to-date">Date</label>
+                            <input type="date" id="analytics-to-date" name="toDate" lang="en-GB" dir="ltr">
+                        </div>
+                        <div class="date-hour-field hour-field">
+                            <label for="analytics-to-hour">Hour (optional)</label>
+                            <select id="analytics-to-hour" name="toHour">
+                                <option value="">Any hour</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
                 <button type="submit" id="load-analytics" class="primary-button">Load analytics</button>
@@ -84,7 +106,7 @@
 
             <div class="stats-row">
                 <div class="stat-card">
-                    <span class="stat-label">Views in selected range</span>
+                    <span id="analytics-view-total-label" class="stat-label">Views in overlapping hourly buckets</span>
                     <span id="analytics-total-views" class="stat-value">0</span>
                 </div>
                 <div class="stat-card">
@@ -95,7 +117,11 @@
 
             <section class="analytics-chart-section" aria-labelledby="views-chart-heading">
                 <h3 id="views-chart-heading">Views over time</h3>
-                <canvas id="views-chart">A chart showing article views over time.</canvas>
+                <div class="analytics-chart-canvas">
+                    <div id="analytics-chart-inner" class="analytics-chart-inner">
+                        <canvas id="views-chart">A chart showing article views over time.</canvas>
+                    </div>
+                </div>
             </section>
 
             <section class="publication-activity" aria-labelledby="publication-activity-heading">

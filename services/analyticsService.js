@@ -64,6 +64,42 @@ async function getArticleAnalytics(articleId, from, to) {
         throw createAnalyticsError("Article not found", 404);
     }
 
+    const publications = (article.publicationHistory || [])
+        .filter((publication) => {
+            if (
+                !publication ||
+                publication.publishedAt === null ||
+                publication.publishedAt === undefined ||
+                publication.publishedAt === ""
+            ) {
+                return false;
+            }
+
+            const publishedAt = new Date(publication?.publishedAt);
+            return !Number.isNaN(publishedAt.getTime());
+        })
+        .slice()
+        .sort((first, second) =>
+            new Date(first.publishedAt) - new Date(second.publishedAt)
+        );
+
+    if (!article.publishedVersion || publications.length === 0) {
+        throw createAnalyticsError(
+            "Article has no valid publication history",
+            400
+        );
+    }
+
+    const firstPublishedAt = new Date(publications[0].publishedAt);
+    const currentTime = new Date();
+
+    if (firstPublishedAt > currentTime) {
+        throw createAnalyticsError(
+            "Article publication history is invalid",
+            400
+        );
+    }
+
     const hasFrom = from !== undefined && from !== null && from !== "";
     const hasTo = to !== undefined && to !== null && to !== "";
     let fromDate;
@@ -78,34 +114,57 @@ async function getArticleAnalytics(articleId, from, to) {
 
     if (
         (hasFrom && Number.isNaN(fromDate.getTime())) ||
-        (hasTo && Number.isNaN(toDate.getTime())) ||
-        (hasFrom && hasTo && fromDate > toDate)
+        (hasTo && Number.isNaN(toDate.getTime()))
     ) {
         throw createAnalyticsError("Invalid date range", 400);
     }
 
-    const statisticFilter = {
-        article: articleId
-    };
-
-    if (hasFrom || hasTo) {
-        statisticFilter.bucketStart = {};
-
-        if (hasFrom) statisticFilter.bucketStart.$gte = fromDate;
-        if (hasTo) statisticFilter.bucketStart.$lte = toDate;
+    if (
+        (hasFrom && fromDate < firstPublishedAt) ||
+        (hasTo && toDate < firstPublishedAt)
+    ) {
+        throw createAnalyticsError(
+            "Analytics dates cannot be before the first publication",
+            400
+        );
     }
+
+    if (
+        (hasFrom && fromDate > currentTime) ||
+        (hasTo && toDate > currentTime)
+    ) {
+        throw createAnalyticsError(
+            "Analytics dates cannot be in the future",
+            400
+        );
+    }
+
+    const effectiveFrom = hasFrom ? fromDate : firstPublishedAt;
+    const effectiveTo = hasTo ? toDate : currentTime;
+
+    if (effectiveFrom > effectiveTo) {
+        throw createAnalyticsError(
+            "From date must not be later than To date",
+            400
+        );
+    }
+
+    const statisticFilter = {
+        article: articleId,
+        bucketStart: {
+            $gte: getHourBucket(effectiveFrom),
+            $lte: getHourBucket(effectiveTo)
+        }
+    };
 
     const statistics = await ViewStatistic.find(statisticFilter)
         .sort({ bucketStart: 1 })
         .lean();
 
-    const publications = (article.publicationHistory || [])
-        .slice()
-        .sort((first, second) => first.publishedAt - second.publishedAt)
-        .map((publication) => ({
-            time: publication.publishedAt,
-            versionNumber: publication.versionNumber
-        }));
+    const publicationEvents = publications.map((publication) => ({
+        time: publication.publishedAt,
+        versionNumber: publication.versionNumber
+    }));
 
     return {
         article: {
@@ -119,7 +178,15 @@ async function getArticleAnalytics(articleId, from, to) {
             time: statistic.bucketStart,
             count: statistic.viewCount
         })),
-        publications
+        publications: publicationEvents,
+        range: {
+            from: effectiveFrom,
+            to: effectiveTo
+        },
+        bounds: {
+            from: firstPublishedAt,
+            to: currentTime
+        }
     };
 }
 

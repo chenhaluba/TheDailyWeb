@@ -8,7 +8,7 @@ exports.getHomePage = async (req, res) => {
 
         const [data, weather] = await Promise.all([
             articleService.getHomePageData(req.query),
-            getWeatherData()
+            weatherController.getWeatherData()
         ]);
 
         return res.render("public/home", {

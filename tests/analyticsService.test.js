@@ -317,14 +317,15 @@ describe("Analytics Service", () => {
     });
 
     test.each([
-        ["invalid from", "not-a-date", undefined],
-        ["invalid to", undefined, "not-a-date"],
+        ["invalid from", "not-a-date", undefined, "Invalid date range"],
+        ["invalid to", undefined, "not-a-date", "Invalid date range"],
         [
             "reversed range",
             "2024-04-02T00:00:00.000Z",
-            "2024-04-01T00:00:00.000Z"
+            "2024-04-01T00:00:00.000Z",
+            "From date must not be later than To date"
         ]
-    ])("getArticleAnalytics rejects an %s", async (caseName, from, to) => {
+    ])("getArticleAnalytics rejects an %s", async (caseName, from, to, message) => {
         await expect(
             analyticsService.getArticleAnalytics(
                 PUBLISHED_ARTICLE_ID,
@@ -332,7 +333,7 @@ describe("Analytics Service", () => {
                 to
             )
         ).rejects.toMatchObject({
-            message: "Invalid date range",
+            message,
             statusCode: 400
         });
     });

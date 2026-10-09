@@ -69,6 +69,7 @@ async function seedDatabase() {
             if (status === "published") {
                 publishedAt = new Date(seedExecutionTime);
                 publishedAt.setUTCDate(publishedAt.getUTCDate() - (8 + ((i - 1) % 7)));
+                publishedAt.setUTCHours(9, 0, 0, 0);
             }
 
             // Generate unique content
@@ -102,16 +103,53 @@ async function seedDatabase() {
 
             // If it's published, copy it to publishedVersion and add history
             if (status === "published") {
+                const secondPublicationAt = new Date(Date.UTC(
+                    seedExecutionTime.getUTCFullYear(),
+                    seedExecutionTime.getUTCMonth(),
+                    seedExecutionTime.getUTCDate() - 6,
+                    10,
+                    30,
+                    0,
+                    0
+                ));
+                const thirdPublicationAt = new Date(Date.UTC(
+                    seedExecutionTime.getUTCFullYear(),
+                    seedExecutionTime.getUTCMonth(),
+                    seedExecutionTime.getUTCDate() - 3,
+                    18,
+                    30,
+                    0,
+                    0
+                ));
+                const approvedContent = `${content}\n\nUpdate 1: The editorial team added verified context and further background after the initial publication.\n\nUpdate 2: The latest approved revision adds follow-up details and clarifies how the story has developed.`;
+                const approvedVersion = {
+                    ...articleVersion,
+                    content: approvedContent,
+                    savedAt: thirdPublicationAt
+                };
                 const createdAt = new Date(publishedAt);
                 createdAt.setUTCDate(createdAt.getUTCDate() - 1);
                 articleData.createdAt = createdAt;
-                articleData.updatedAt = publishedAt;
-                articleData.publishedVersion = articleVersion;
-                articleData.publicationHistory = [{
-                    publishedAt,
-                    approvedBy: editor._id,
-                    versionNumber: 1
-                }];
+                articleData.updatedAt = thirdPublicationAt;
+                articleData.publishedVersion = approvedVersion;
+                articleData.workingVersion = approvedVersion;
+                articleData.publicationHistory = [
+                    {
+                        publishedAt,
+                        approvedBy: editor._id,
+                        versionNumber: 1
+                    },
+                    {
+                        publishedAt: secondPublicationAt,
+                        approvedBy: editor._id,
+                        versionNumber: 2
+                    },
+                    {
+                        publishedAt: thirdPublicationAt,
+                        approvedBy: editor._id,
+                        versionNumber: 3
+                    }
+                ];
             } else if (status === "returned") {
                 articleData.editorNote = "Please fix the grammatical errors in the second paragraph before I can publish this.";
             }
@@ -163,31 +201,52 @@ async function seedDatabase() {
         const totalViewUpdates = publishedArticles.map(({ article }) => ({
             updateOne: {
                 filter: { _id: article._id },
-                update: { $set: { totalViews: articleViewTotals.get(article._id.toString()) } }
+                update: { $set: { totalViews: articleViewTotals.get(article._id.toString()) } },
+                timestamps: false
             }
         }));
         await Article.bulkWrite(totalViewUpdates);
 
-        const commentAuthors = ["Dana", "Ariel", "Noam", "Maya"];
+        const commentAuthors = ["Dana", "Ariel", "Noam", "Maya", "Lior", "Roni"];
         const commentContents = [
             "A clear overview of the topic. Thanks for the update.",
-            "The background details made this easy to follow."
+            "The background details made this easy to follow.",
+            "I appreciated the follow-up context in the latest revision.",
+            "This raises an interesting question about what happens next."
+        ];
+        const commentTimes = [
+            { dayOffset: 7, hour: 11, minute: 15 },
+            { dayOffset: 5, hour: 14, minute: 40 },
+            { dayOffset: 2, hour: 9, minute: 25 },
+            { dayOffset: 1, hour: 21, minute: 5 }
         ];
         const comments = [];
 
-        for (const { article, index } of publishedArticles.slice(0, 6)) {
+        for (const { article, index } of publishedArticles) {
             const publishedAt = article.publicationHistory[0].publishedAt;
 
-            for (let commentIndex = 0; commentIndex < 2; commentIndex++) {
-                const createdAt = new Date(publishedAt);
-                createdAt.setDate(createdAt.getDate() + 2 + (commentIndex * 2));
+            for (let commentIndex = 0; commentIndex < commentContents.length; commentIndex++) {
+                const commentTime = commentTimes[commentIndex];
+                const createdAt = new Date(Date.UTC(
+                    seedExecutionTime.getUTCFullYear(),
+                    seedExecutionTime.getUTCMonth(),
+                    seedExecutionTime.getUTCDate() - commentTime.dayOffset,
+                    commentTime.hour,
+                    commentTime.minute,
+                    0,
+                    0
+                ));
+
+                if (createdAt <= publishedAt) {
+                    createdAt.setTime(publishedAt.getTime() + ((commentIndex + 1) * 60 * 60 * 1000));
+                }
 
                 comments.push({
                     article: article._id,
                     authorName: commentAuthors[(index + commentIndex) % commentAuthors.length],
                     content: commentContents[commentIndex],
                     deviceId: `seed-device-${index + 1}-${commentIndex + 1}`,
-                    isVisible: comments.length % 5 !== 4,
+                    isVisible: true,
                     createdAt,
                     updatedAt: createdAt
                 });

@@ -38,6 +38,12 @@ async function updateWorkingVersion(id, updates = {}) {
     if (!article) {
         throw createWorkflowError("Article not found", 404);
     }
+    if (article.status !== CONSTANTS.ARTICLE_STATUS.PENDING) {
+    throw createWorkflowError(
+        "Only pending articles can be edited by an editor",
+        400
+    );
+    }
 
     const allowedFields = [
         "title",
@@ -95,29 +101,15 @@ async function returnArticle(id, editorNote) {
         throw createWorkflowError("Article not found", 404);
     }
 
-    const canReturn =
-        article.status === CONSTANTS.ARTICLE_STATUS.PENDING ||
-        article.status === CONSTANTS.ARTICLE_STATUS.PUBLISHED;
-
-    if (!canReturn) {
+    if (article.status !== CONSTANTS.ARTICLE_STATUS.PENDING) {
         throw createWorkflowError(
-            "Only pending or published articles can be returned",
+            "Only pending articles can be returned",
             400
         );
     }
 
     if (typeof editorNote !== "string" || !editorNote.trim()) {
         throw createWorkflowError("Editor note is required", 400);
-    }
-
-    if (
-        article.status === CONSTANTS.ARTICLE_STATUS.PUBLISHED &&
-        article.publishedVersion
-    ) {
-        article.workingVersion = {
-            ...article.publishedVersion.toObject(),
-            savedAt: new Date()
-        };
     }
 
     article.status = CONSTANTS.ARTICLE_STATUS.RETURNED;

@@ -120,15 +120,23 @@ async function returnArticle(id, editorNote) {
     return article;
 }
 async function deleteArticle(id) {
-    const article = await Article.findByIdAndDelete(id);
+    const article = await Article.findById(id);
 
     if (!article) {
         throw createWorkflowError("Article not found", 404);
     }
 
+    if (article.status !== CONSTANTS.ARTICLE_STATUS.PENDING) {
+        throw createWorkflowError(
+            "Only pending articles can be deleted",
+            400
+        );
+    }
+
+    await article.deleteOne();
+
     return article;
 }
-
 module.exports = {
     getEditorArticles,
     getEditorArticleById,

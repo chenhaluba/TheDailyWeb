@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title><%= pageTitle %> | The Daily Web</title>
+
+    <link rel="stylesheet" href="/css/reporter.css">
+    <link rel="stylesheet" href="/css/editorReview.css">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="header-content">
+        <a href="/" class="site-logo">The Daily Web</a>
+
+        <nav class="header-navigation">
+            <a href="/editor/dashboard">Dashboard</a>
+            <a href="/user/profile">My Profile</a>
+            <a href="/logout">Logout</a>
+        </nav>
+    </div>
+</header>
+
+<main
+    class="review-container"
+    id="review-page"
+    data-article-id="<%= article._id %>"
+    data-status="<%= article.status %>"
+>
+
+    <div class="review-heading">
+        <div>
+            <a href="/editor/dashboard" class="back-link">
+                ← Back to Dashboard
+            </a>
+
+            <h1>Review Article</h1>
+
+            <p class="article-meta">
+                Reporter:
+                <strong>
+                    <%= article.author?.displayName || article.author?.username || "Unknown" %>
+                </strong>
+            </p>
+        </div>
+
+        <span class="status-badge status-<%= article.status %>">
+            <%= article.status %>
+        </span>
+    </div>
+
+    <div id="message-box" class="message-box" hidden></div>
+
+    <% if (article.publishedVersion) { %>
+
+        <section class="version-comparison">
+
+            <div class="version-panel published-panel">
+                <h2>Currently Published</h2>
+
+                <div class="readonly-field">
+                    <label>Title</label>
+                    <p><%= article.publishedVersion.title %></p>
+                </div>
+
+                <div class="readonly-field">
+                    <label>Summary</label>
+                    <p><%= article.publishedVersion.summary %></p>
+                </div>
+
+                <div class="readonly-field">
+                    <label>Category</label>
+                    <p><%= article.publishedVersion.category %></p>
+                </div>
+
+                <div class="readonly-field">
+                    <label>Main Image</label>
+                    <p><%= article.publishedVersion.mainImage || "No image" %></p>
+                </div>
+
+                <div class="readonly-field">
+                    <label>Content</label>
+                    <p class="article-content">
+                        <%= article.publishedVersion.content %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="version-panel working-panel">
+                <h2>Working Version</h2>
+
+                <%- include("workingVersionForm", { article }) %>
+            </div>
+
+        </section>
+
+    <% } else { %>
+
+        <section class="single-version">
+            <div class="version-panel working-panel">
+                <h2>Working Version</h2>
+
+                <p class="version-note">
+                    This article does not have a published version yet.
+                </p>
+
+                <%- include("workingVersionForm", { article }) %>
+            </div>
+        </section>
+
+    <% } %>
+
+    <section class="editor-actions">
+
+           <div class="return-section">
+             <label for="editor-note">Editor Note</label>
+
+             <textarea
+        id="editor-note"
+        maxlength="1000"
+        placeholder="Explain what the reporter should change..."
+       ><%= article.editorNote || "" %></textarea>
+
+         <p
+        id="editor-note-error"
+        class="editor-note-error"
+        role="alert"
+        hidden
+        ></p>
+        </div>
+
+        <div class="action-buttons">
+
+            <button
+                type="button"
+                id="approve-button"
+                class="primary-button"
+                <%= article.status !== "pending" ? "disabled" : "" %>
+            >
+                Approve & Publish
+            </button>
+
+            <button
+                type="button"
+                id="return-button"
+                class="secondary-button"
+                <%= (article.status !== "pending" && article.status !== "published") ? "disabled" : "" %>
+            >
+                Return to Reporter
+            </button>
+
+            <button
+                type="button"
+                id="delete-button"
+                class="danger-button"
+            >
+                Delete Article
+            </button>
+
+        </div>
+
+        <% if (article.status !== "pending") { %>
+            <p class="action-note">
+                Approve and Return are available only for pending articles.
+            </p>
+        <% } %>
+
+    </section>
+
+</main>
+
+<script src="/js/editorReview.js"></script>
+
+</body>
+</html>

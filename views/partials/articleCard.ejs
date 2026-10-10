@@ -1,0 +1,37 @@
+<article class="article-card">
+
+    <img
+        src="/images/<%= article.publishedVersion.mainImage %>"
+        alt="<%= article.publishedVersion.title %>">
+
+    <div class="article-card-content">
+
+        <span class="category">
+            <%= article.publishedVersion.category %>
+        </span>
+
+        <h3>
+            <%= article.publishedVersion.title %>
+        </h3>
+        
+        <div class="article-card-meta">
+            <span>By <%= article.author?.displayName || "Unknown Author" %></span>
+            <span><%= article.publishedVersion.savedAt
+                ? new Date(article.publishedVersion.savedAt).toLocaleDateString("en-US")
+                : "" %></span>
+        </div>
+        
+        <p>
+            <%= article.publishedVersion.summary %>
+        </p>
+
+        <a
+            href="/articles/<%= article._id %>">
+
+            Read More →
+
+        </a>
+
+    </div>
+
+</article>

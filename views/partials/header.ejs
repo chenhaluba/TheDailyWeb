@@ -1,0 +1,54 @@
+<header class="site-header">
+
+    <div class="container">
+
+        <div class="header-left">
+            <div class="header-weather">
+                <%- include("weatherWidget") %>
+            </div>
+    
+            <div class="logo">
+                <a href="/">The Daily Web</a>
+            </div>
+        </div>
+
+        <% const categories=[ "News" , "Economy" , "Politics" , "Sports" , "Culture" , "Technology" , "Science" ]; const
+            currentSearch=typeof search !=="undefined" ? search : "" ; const currentCategory=typeof category
+            !=="undefined" ? category : "" ; const currentSort=typeof sort !=="undefined" ? sort : "" ; const
+            searchQuery=currentSearch ? `&search=${encodeURIComponent(currentSearch)}` : "" ; const
+            sortQuery=currentSort ? `&sort=${currentSort}` : "" ; %>
+
+            <nav class="main-nav">
+
+                <a href="/" data-category="" class="<%= !currentCategory ? 'active' : '' %>">
+                    Home
+                </a>
+
+                <% categories.forEach(cat=> { %>
+
+                    <a href="/?category=<%= cat %><%= searchQuery %><%= sortQuery %>" data-category="<%= cat %>"
+                        class="<%= currentCategory === cat ? 'active' : '' %>">
+
+                        <%= cat %>
+
+                    </a>
+
+                    <% }) %>
+
+            </nav>
+
+            <div class="user-actions">
+
+                <a href="/login">
+                    Login
+                </a>
+
+                <a href="/user/profile">
+                    My Profile
+                </a>
+
+            </div>
+
+    </div>
+
+</header>

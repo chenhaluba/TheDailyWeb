@@ -1,0 +1,8 @@
+<% if (typeof weather !== 'undefined' && weather) { %>
+    <div class="weather-widget compact">
+        <div class="weather-info">
+            <span class="weather-city"><%= weather.city || "Tel Aviv" %></span>
+            <span class="weather-temp"><%= weather.temp %>°C</span>
+        </div>
+    </div>
+<% } %>

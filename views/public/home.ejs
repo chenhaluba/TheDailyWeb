@@ -1,19 +1,252 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= pageTitle %></title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <header>
-        <h1>The Daily Web</h1>
-    </header>
 
-    <main>
-        <h2>חדשות היום</h2>
-        <p>המערכת פועלת בהצלחה.</p>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title><%= pageTitle %></title>
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/home.css">
+</head>
+
+<body>
+
+    <%- include("../partials/header") %>
+
+    <main class="container home-container">
+
+        <div class="home-main-content">
+
+            <!-- Main Article -->
+            <% if (mainArticle) { %>
+
+            <section id="main-article-section">
+
+                <h2 class="section-title">
+                    Top Story
+                </h2>
+
+                <%- include("../partials/mainArticle") %>
+
+            </section>
+
+        <% } %>
+
+        <!-- Search -->
+        <section id="filters-section">
+
+            <form
+                id="search-form"
+                method="GET"
+                action="/">
+
+                <input
+                    id="search-input"
+                    type="text"
+                    name="search"
+                    value="<%= search || '' %>"
+                    placeholder="Search by title...">
+
+                <input
+                    id="category-input"
+                    type="hidden"
+                    name="category"
+                    value="<%= category || '' %>">
+
+                <input
+                    type="hidden"
+                    name="sort"
+                    value="<%= sort || 'newest' %>">
+
+                <button
+                    id="search-button"
+                    type="submit">
+
+                    🔍 Search
+
+                </button>
+
+            </form>
+
+        </section>
+
+        <!-- Articles -->
+        <section id="articles-section">
+
+            <div class="articles-toolbar">
+
+                <div>
+
+                    <h2
+                        id="articles-title"
+                        class="section-title">
+
+                        <% if (search) { %>
+
+                            Search Results
+
+                        <% } else if (category) { %>
+
+                            <%= category %> News
+
+                        <% } else { %>
+
+                            Latest News
+
+                        <% } %>
+
+                    </h2>
+
+                    <p
+                        id="results-count"
+                        class="results-count">
+
+                        <% if (search) { %>
+
+                            Showing
+                            <strong>
+                                <%= resultsCount %>
+                            </strong>
+                            article(s) matching
+                            "<%= search %>"
+
+                        <% } else if (category) { %>
+
+                            Showing
+                            <strong>
+                                <%= resultsCount %>
+                            </strong>
+                            article(s)
+
+                        <% } %>
+
+                    </p>
+
+                </div>
+
+                <!-- Sort -->
+                <form
+                    id="sort-form"
+                    method="GET"
+                    action="/">
+
+                    <% if (search) { %>
+
+                        <input
+                            type="hidden"
+                            name="search"
+                            value="<%= search %>">
+
+                    <% } %>
+
+                    <% if (category) { %>
+
+                        <input
+                            type="hidden"
+                            name="category"
+                            value="<%= category %>">
+
+                    <% } %>
+
+                    <label for="sort-filter">
+                        Sort by
+                    </label>
+
+                    <select
+                        id="sort-filter"
+                        name="sort">
+
+                        <option
+                            value="newest"
+                            <%= sort === "newest"
+                                ? "selected"
+                                : "" %>>
+
+                            Newest
+
+                        </option>
+
+                        <option
+                            value="popular"
+                            <%= sort === "popular"
+                                ? "selected"
+                                : "" %>>
+
+                            Most Viewed
+
+                        </option>
+
+                    </select>
+
+                </form>
+
+            </div>
+
+            <!-- Feed -->
+            <div class="articles-grid">
+
+                <% if (articles && articles.length > 0) { %>
+
+                    <% articles.forEach(article => { %>
+
+                        <%- include(
+                            "../partials/articleCard",
+                            { article }
+                        ) %>
+
+                    <% }) %>
+
+                <% } else { %>
+
+                    <div class="empty-state">
+
+                        <% if (search) { %>
+
+                            <h3>No results found</h3>
+
+                            <p>
+                                We couldn't find any articles matching
+                                "<%= search %>".
+                            </p>
+
+                        <% } else { %>
+
+                            <h3>No articles available</h3>
+
+                            <p>
+                                There are currently no articles available.
+                            </p>
+
+                        <% } %>
+
+                    </div>
+
+                <% } %>
+
+            </div>
+
+            <!-- Infinite Scroll -->
+            <div
+                id="feed-sentinel"
+                data-has-more="<%= hasMore %>">
+            </div>
+
+        </section>
+        
     </main>
+
+    <%- include("../partials/footer") %>
+
+    <script
+        src="/js/feed.js"
+        defer>
+    </script>
+
 </body>
+
 </html>

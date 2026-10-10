@@ -92,10 +92,22 @@ async function updateUser(req, res) {
     try {
         const { username, newDisplayName, newRole, newPassword, isActive } = req.body;
 
+        const targetUser = await User.findOne({ username: username });
+        if (!targetUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (req.user.role !== 'editor' && req.user.userID !== targetUser._id.toString()) {
+            return res.status(403).json({ message: "Forbidden: You can only update your own profile" });
+        }
+
         const updateData = {};
         if (newDisplayName) updateData.displayName = newDisplayName;
-        if (newRole) updateData.role = newRole;
-        if (typeof isActive === 'boolean') updateData.isActive = isActive;
+        
+        if (req.user.role === 'editor') {
+            if (newRole) updateData.role = newRole;
+            if (typeof isActive === 'boolean') updateData.isActive = isActive;
+        }
 
         if (newPassword) {
             updateData.passwordHash = await bcrypt.hash(newPassword, 10);
@@ -107,11 +119,7 @@ async function updateUser(req, res) {
             { new: true }
         ).select('-passwordHash');
 
-        if (updatedUser) {
-            return res.status(200).json({ message: "User updated successfully", user: updatedUser });
-        } else {
-            return res.status(404).json({ message: "User not found" });
-        }
+        return res.status(200).json({ message: "User updated successfully", user: updatedUser });
     } catch (error) {
         console.error("Error updating user:", error);
         return res.status(500).send("Internal Server Error");

@@ -55,6 +55,51 @@ img {
     gap: 20px;
 }
 
+.header-weather {
+    display: flex;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.weather-widget.compact {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f0f2f5;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.weather-widget.compact .weather-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.weather-widget.compact .weather-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.weather-widget.compact .weather-city {
+    font-weight: 600;
+    border-right: 1px solid #ccc;
+    padding-right: 8px;
+}
+
+.weather-widget.compact .weather-temp {
+    font-weight: 700;
+    color: #0a66c2;
+}
+
 .logo a {
     font-size: 2rem;
     font-weight: bold;

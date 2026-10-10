@@ -2,8 +2,14 @@
 
     <div class="container">
 
-        <div class="logo">
-            <a href="/">The Daily Web</a>
+        <div class="header-left">
+            <div class="header-weather">
+                <%- include("weatherWidget") %>
+            </div>
+    
+            <div class="logo">
+                <a href="/">The Daily Web</a>
+            </div>
         </div>
 
         <% const categories=[ "News" , "Economy" , "Politics" , "Sports" , "Culture" , "Technology" , "Science" ]; const

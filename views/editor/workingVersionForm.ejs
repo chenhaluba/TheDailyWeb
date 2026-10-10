@@ -10,6 +10,7 @@
             maxlength="200"
             value="<%= article.workingVersion?.title || "" %>"
             required
+            <%= article.status !== "pending" ? "disabled" : "" %>
         >
     </div>
 
@@ -20,6 +21,7 @@
             id="summary"
             name="summary"
             maxlength="500"
+            <%= article.status !== "pending" ? "disabled" : "" %>
         ><%= article.workingVersion?.summary || "" %></textarea>
     </div>
 
@@ -31,6 +33,7 @@
             id="category"
             name="category"
             value="<%= article.workingVersion?.category || "" %>"
+            <%= article.status !== "pending" ? "disabled" : "" %>
         >
     </div>
 
@@ -42,6 +45,7 @@
             id="mainImage"
             name="mainImage"
             value="<%= article.workingVersion?.mainImage || "" %>"
+            <%= article.status !== "pending" ? "disabled" : "" %>
         >
     </div>
 
@@ -53,10 +57,15 @@
             name="content"
             class="content-input"
             required
+            <%= article.status !== "pending" ? "disabled" : "" %>
         ><%= article.workingVersion?.content || "" %></textarea>
     </div>
 
-    <button type="submit" class="save-button">
+    <button
+        type="submit"
+        class="save-button"
+        <%= article.status !== "pending" ? "disabled" : "" %>
+    >
         Save Changes
     </button>
 

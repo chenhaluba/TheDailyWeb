@@ -148,7 +148,7 @@
                 type="button"
                 id="return-button"
                 class="secondary-button"
-                <%= (article.status !== "pending" && article.status !== "published") ? "disabled" : "" %>
+                <%= article.status !== "pending" ? "disabled" : "" %>"disabled" : "" %>
             >
                 Return to Reporter
             </button>
